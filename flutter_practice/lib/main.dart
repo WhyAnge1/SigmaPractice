@@ -5,6 +5,7 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'misc/strings.dart';
 
 void main() {
+  dynamic a;
   runApp(const Application());
 }
 

@@ -33,7 +33,7 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
   Future logout() async {
     final prefferences = await SharedPreferences.getInstance();
     prefferences.remove(Constants.autoLoginEmailPreffName);
-    UserInfo.clearLoggenInUser();
+    UserInfo.clearLoggedInUser();
 
     _emit(shouldLogout: true);
   }

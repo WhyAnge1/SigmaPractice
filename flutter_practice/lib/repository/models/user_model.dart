@@ -8,8 +8,8 @@ class UserModel {
   final String password;
   final String username;
 
-  UserModel({
-      this.id,
+  UserModel(
+      {this.id,
       required this.email,
       required this.password,
       required this.username});

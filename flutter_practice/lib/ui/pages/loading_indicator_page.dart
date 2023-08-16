@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 
 import 'comments_page.dart';
 
+// This page used to practice with flutter UI elements
+
 class LoadingIndicatorPage extends StatefulWidget {
   const LoadingIndicatorPage({super.key});
 
@@ -24,7 +26,7 @@ class _LoadingIndicatorPageState extends State<LoadingIndicatorPage> {
           IconButton(
             icon: const Icon(Icons.rate_review_rounded),
             color: Colors.white,
-            onPressed: () => {Get.to(() => CommentsPage())},
+            onPressed: () => {Get.to(() => const CommentsPage())},
           ),
         ],
       ),

@@ -7,6 +7,8 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../repository/models/rating_model.dart';
 
+// This page used to practice with ListView
+
 class CommentsPage extends StatefulWidget {
   const CommentsPage({super.key});
 
@@ -190,12 +192,12 @@ class _CommentsPageState extends State<CommentsPage> {
               )),
         ])
       : SizedBox(
-        width: 120,
-        height: 120,
-        child: CircleAvatar(
-                backgroundColor: Colors.transparent,
-                  backgroundImage: Image.file(_uploadedImage).image),
-      );
+          width: 120,
+          height: 120,
+          child: CircleAvatar(
+              backgroundColor: Colors.transparent,
+              backgroundImage: Image.file(_uploadedImage).image),
+        );
 
   Future _uploadPhoto() async {
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -253,9 +255,9 @@ class _RatingCell extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: CircleAvatar(
-              backgroundColor: Colors.transparent,
+                backgroundColor: Colors.transparent,
                 backgroundImage: _ownerImage.isEmpty
-                    ? AssetImage('assets/images/default_user_icon.png')
+                    ? const AssetImage('assets/images/default_user_icon.png')
                     : Image.file(File(_ownerImage)).image),
           ),
           Expanded(
