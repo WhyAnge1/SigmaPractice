@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../../cubit/cubits/create_account_cubit.dart';
 import '../../cubit/states/create_account_state.dart';
+import '../../misc/app_colors.dart';
+import '../../misc/app_fonts.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -13,29 +15,68 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
-  final CreateAccountCubit cubit = CreateAccountCubit();
+  final _cubit = CreateAccountCubit();
   final _nameTextFieldController = TextEditingController();
   final _emailTextFieldController = TextEditingController();
   final _passwordTexFieldController = TextEditingController();
   final _confirmPasswordTexFieldController = TextEditingController();
+  bool _shouldHidePassword = true;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text('createYourAccount'.tr),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(40),
-        child: BlocConsumer<CreateAccountCubit, CreateAccountState>(
-          listener: _createAccountPageConsumerListener,
-          bloc: cubit,
-          builder: _createAccountPageConsumerBuilder,
-        ),
-      ),
-    );
+  void dispose() {
+    _nameTextFieldController.dispose();
+    _emailTextFieldController.dispose();
+    _passwordTexFieldController.dispose();
+    _confirmPasswordTexFieldController.dispose();
+
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: AppColors.backgroundWhite,
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('createYourAccountTitle'.tr,
+                  style: const TextStyle(
+                      color: AppColors.textBlack,
+                      fontFamily: AppFonts.productSans,
+                      fontSize: 24,
+                      height: 2,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(height: 70),
+              BlocConsumer<CreateAccountCubit, CreateAccountState>(
+                listener: _createAccountPageConsumerListener,
+                bloc: _cubit,
+                builder: _createAccountPageConsumerBuilder,
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('alreadyHaveAnAccount'.tr,
+                      style: const TextStyle(
+                          color: AppColors.textBlack,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16)),
+                  TextButton(
+                      onPressed: _onLogInPressed,
+                      child: Text('logIn'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textBlack,
+                              decoration: TextDecoration.underline,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 16))),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
 
   Widget _createAccountPageConsumerBuilder(
           BuildContext context, CreateAccountState state) =>
@@ -44,146 +85,139 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         children: [
           TextField(
             controller: _nameTextFieldController,
+            keyboardType: TextInputType.name,
             decoration: InputDecoration(
-              hintText: 'username'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              errorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
+              hintText: 'enterYourUsername'.tr,
+              hintStyle: const TextStyle(
+                  color: AppColors.disabledGrey,
+                  fontFamily: AppFonts.productSans,
+                  fontSize: 16),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 40),
           TextField(
             controller: _emailTextFieldController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              hintText: 'email'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              errorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
+              hintText: 'emailAdress'.tr,
+              hintStyle: const TextStyle(
+                  color: AppColors.disabledGrey,
+                  fontFamily: AppFonts.productSans,
+                  fontSize: 16),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 40),
           TextField(
             controller: _passwordTexFieldController,
-            obscureText: state.shouldHidePassword,
+            obscureText: _shouldHidePassword,
+            keyboardType: _shouldHidePassword
+                ? TextInputType.text
+                : TextInputType.visiblePassword,
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 icon: Icon(
-                    state.shouldHidePassword
+                    _shouldHidePassword
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.deepPurpleAccent),
-                onPressed: () => _onHidePasswordPressed(state),
+                    color: AppColors.iconGrey),
+                onPressed: _onHidePasswordPressed,
               ),
               hintText: 'password'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              errorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
+              hintStyle: const TextStyle(
+                  color: AppColors.disabledGrey,
+                  fontFamily: AppFonts.productSans,
+                  fontSize: 16),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 40),
           TextField(
             controller: _confirmPasswordTexFieldController,
-            obscureText: state.shouldHidePassword,
+            obscureText: _shouldHidePassword,
+            keyboardType: _shouldHidePassword
+                ? TextInputType.text
+                : TextInputType.visiblePassword,
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 icon: Icon(
-                    state.shouldHidePassword
+                    _shouldHidePassword
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.deepPurpleAccent),
-                onPressed: () => _onHidePasswordPressed(state),
+                    color: AppColors.iconGrey),
+                onPressed: _onHidePasswordPressed,
               ),
               hintText: 'confirmPassword'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              errorBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
+              hintStyle: const TextStyle(
+                  color: AppColors.disabledGrey,
+                  fontFamily: AppFonts.productSans,
+                  fontSize: 16),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.separatorGrey),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 40),
           ElevatedButton(
-            onPressed: _onCreateAccountPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-            ),
-            child: Text('createAnAccount'.tr),
-          ),
+              onPressed: _onCreateAccountPressed,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.backgroundBlack,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 35),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  )),
+              child: Text('signUpCaps'.tr,
+                  style: const TextStyle(
+                      color: AppColors.backgroundWhite,
+                      fontFamily: AppFonts.productSans,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18))),
         ],
       );
 
   void _createAccountPageConsumerListener(
       BuildContext context, CreateAccountState state) {
-    if (state.isAccountCreatedSuccessfully) {
-      Get.back(result: state.newUserLogin);
-      Get.snackbar('message'.tr,
-          "${'accountFor'.tr} ${state.newUserLogin} ${'createdSuccessfully'.tr}");
-    } else if (state.errorText != null) {
+    if (state.errorText != null) {
       Get.snackbar('error'.tr, state.errorText!);
     }
   }
 
-  void _onHidePasswordPressed(CreateAccountState state) =>
-      cubit.setShouldHidePassword(!state.shouldHidePassword);
+  void _onHidePasswordPressed() =>
+      setState(() => _shouldHidePassword = !_shouldHidePassword);
 
-  void _onCreateAccountPressed() => cubit.createAccount(
-      _nameTextFieldController.text,
-      _emailTextFieldController.text,
-      _passwordTexFieldController.text,
-      _confirmPasswordTexFieldController.text);
+  Future _onCreateAccountPressed() async {
+    var isAccountCreated = await _cubit.createAccount(
+        _nameTextFieldController.text,
+        _emailTextFieldController.text,
+        _passwordTexFieldController.text,
+        _confirmPasswordTexFieldController.text);
+
+    if (isAccountCreated) {
+      Get.back(result: _emailTextFieldController.text);
+      Get.snackbar('info'.tr,
+          "${'accountFor'.tr} ${_emailTextFieldController.text} ${'createdSuccessfully'.tr}");
+    }
+  }
+
+  void _onLogInPressed() => Get.back();
 }

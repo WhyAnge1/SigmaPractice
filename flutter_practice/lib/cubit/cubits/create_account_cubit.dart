@@ -8,50 +8,38 @@ import '../../repository/repositories/database.dart';
 import '../states/create_account_state.dart';
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
-  bool _shouldHidePassword = true;
-
   CreateAccountCubit() : super(CreateAccountState());
 
-  void setShouldHidePassword(bool newValue) {
-    _shouldHidePassword = newValue;
-    emit(CreateAccountState(shouldHidePassword: _shouldHidePassword));
-  }
-
-  Future createAccount(String username, String email, String password,
+  Future<bool> createAccount(String username, String email, String password,
       String confirmPassword) async {
     MobileDatabase? database;
+    bool isAccountCreated = false;
 
-    if (!validateInputData(username, email, password, confirmPassword)) {
-      return;
-    }
+    if (validateInputData(username, email, password, confirmPassword)) {
+      try {
+        database = await $FloorMobileDatabase
+            .databaseBuilder(Constants.databaseFileName)
+            .build();
 
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
+        final existUser = await database.userDao.findUserByEmail(email);
 
-      final existUser = await database.userDao.findUserByEmail(email);
-      if (existUser != null) {
-        emit(CreateAccountState(
-            errorText: 'emailExistError'.tr,
-            shouldHidePassword: _shouldHidePassword));
-      } else {
-        final newUser =
-            UserModel(username: username, email: email, password: password);
-        await database.userDao.insertUser(newUser);
+        if (existUser != null) {
+          _emit(errorText: 'emailExistError'.tr);
+        } else {
+          final newUser =
+              UserModel(username: username, email: email, password: password);
+          await database.userDao.insertUser(newUser);
 
-        emit(CreateAccountState(
-            isAccountCreatedSuccessfully: true,
-            newUserLogin: email,
-            shouldHidePassword: _shouldHidePassword));
+          isAccountCreated = true;
+        }
+      } catch (ex) {
+        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
+      } finally {
+        database?.close();
       }
-    } catch (ex) {
-      emit(CreateAccountState(
-          errorText: 'systemErrorPleaseContactUs'.tr,
-          shouldHidePassword: _shouldHidePassword));
-    } finally {
-      database?.close();
     }
+
+    return isAccountCreated;
   }
 
   bool validateInputData(
@@ -73,10 +61,12 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
     isValid = errorText == null;
     if (!isValid) {
-      emit(CreateAccountState(
-          errorText: errorText, shouldHidePassword: _shouldHidePassword));
+      _emit(errorText: errorText);
     }
 
     return isValid;
   }
+
+  void _emit({String? errorText}) =>
+      emit(CreateAccountState(errorText: errorText));
 }

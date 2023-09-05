@@ -1,11 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_practice/misc/constants.dart';
-import 'package:flutter_practice/misc/user_info.dart';
 import 'package:flutter_practice/network/api_client.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../misc/api_urls.dart';
 import '../states/text_to_speach_state.dart';
@@ -30,14 +28,6 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
     _player.dispose();
   }
 
-  Future logout() async {
-    final prefferences = await SharedPreferences.getInstance();
-    prefferences.remove(Constants.autoLoginEmailPreffName);
-    UserInfo.clearLoggedInUser();
-
-    _emit(shouldLogout: true);
-  }
-
   void playAudioFile() {
     _player.resume();
     _isOnPause = false;
@@ -53,7 +43,6 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
   }
 
   Future convertTextToSpeach(String textToConvert) async {
-    String? errorText;
     _isAudioExist = false;
     _isOnPause = true;
     _player.stop();
@@ -61,7 +50,7 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
     _emit(isLoading: true);
 
     if (textToConvert.isEmpty) {
-      errorText = 'emptyTextError'.tr;
+      _emit(errorText: 'emptyTextError'.tr);
     } else {
       try {
         final downloadedFileDirectory = await getTemporaryDirectory();
@@ -77,24 +66,22 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
           _player.setSource(DeviceFileSource(downloadedFilePath));
 
           _isAudioExist = true;
+
+          _emit();
         } else {
-          errorText = 'textToSpeachConvertionNotAvailableError'.tr;
+          _emit(errorText: 'textToSpeachConvertionNotAvailableError'.tr);
         }
       } catch (ex) {
-        errorText = 'systemErrorPleaseContactUs'.tr;
+        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
       }
     }
-
-    _emit(errorText: errorText);
   }
 
-  void _emit(
-      {String? errorText, bool shouldLogout = false, bool isLoading = false}) {
+  void _emit({String? errorText, bool isLoading = false}) {
     emit(TextToSpeachState(
         isLoading: isLoading,
         errorText: errorText,
         isAudioExist: _isAudioExist,
-        isOnPause: _isOnPause,
-        shouldLogout: shouldLogout));
+        isOnPause: _isOnPause));
   }
 }

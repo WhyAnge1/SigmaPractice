@@ -63,6 +63,8 @@ class _$MobileDatabase extends MobileDatabase {
 
   UserDao? _userDaoInstance;
 
+  CommentDao? _commentDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -86,6 +88,8 @@ class _$MobileDatabase extends MobileDatabase {
       onCreate: (database, version) async {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `UserModel` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `email` TEXT NOT NULL, `password` TEXT NOT NULL, `username` TEXT NOT NULL)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `CommentModel` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `ownerId` INTEGER NOT NULL, `rating` REAL NOT NULL, `comment` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `ownerImageFilePath` TEXT, FOREIGN KEY (`ownerId`) REFERENCES `UserModel` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -96,6 +100,11 @@ class _$MobileDatabase extends MobileDatabase {
   @override
   UserDao get userDao {
     return _userDaoInstance ??= _$UserDao(database, changeListener);
+  }
+
+  @override
+  CommentDao get commentDao {
+    return _commentDaoInstance ??= _$CommentDao(database, changeListener);
   }
 }
 
@@ -112,6 +121,26 @@ class _$UserDao extends UserDao {
                   'email': item.email,
                   'password': item.password,
                   'username': item.username
+                }),
+        _userModelUpdateAdapter = UpdateAdapter(
+            database,
+            'UserModel',
+            ['id'],
+            (UserModel item) => <String, Object?>{
+                  'id': item.id,
+                  'email': item.email,
+                  'password': item.password,
+                  'username': item.username
+                }),
+        _userModelDeletionAdapter = DeletionAdapter(
+            database,
+            'UserModel',
+            ['id'],
+            (UserModel item) => <String, Object?>{
+                  'id': item.id,
+                  'email': item.email,
+                  'password': item.password,
+                  'username': item.username
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -121,6 +150,10 @@ class _$UserDao extends UserDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<UserModel> _userModelInsertionAdapter;
+
+  final UpdateAdapter<UserModel> _userModelUpdateAdapter;
+
+  final DeletionAdapter<UserModel> _userModelDeletionAdapter;
 
   @override
   Future<UserModel?> findUserByEmail(String email) async {
@@ -134,7 +167,101 @@ class _$UserDao extends UserDao {
   }
 
   @override
+  Future<UserModel?> findUserById(int id) async {
+    return _queryAdapter.query('SELECT * FROM UserModel WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => UserModel(
+            id: row['id'] as int?,
+            email: row['email'] as String,
+            password: row['password'] as String,
+            username: row['username'] as String),
+        arguments: [id]);
+  }
+
+  @override
   Future<void> insertUser(UserModel person) async {
     await _userModelInsertionAdapter.insert(person, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateUser(UserModel person) async {
+    await _userModelUpdateAdapter.update(person, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteUser(UserModel person) async {
+    await _userModelDeletionAdapter.delete(person);
+  }
+}
+
+class _$CommentDao extends CommentDao {
+  _$CommentDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _commentModelInsertionAdapter = InsertionAdapter(
+            database,
+            'CommentModel',
+            (CommentModel item) => <String, Object?>{
+                  'id': item.id,
+                  'ownerId': item.ownerId,
+                  'rating': item.rating,
+                  'comment': item.comment,
+                  'ownerName': item.ownerName,
+                  'ownerImageFilePath': item.ownerImageFilePath
+                }),
+        _commentModelDeletionAdapter = DeletionAdapter(
+            database,
+            'CommentModel',
+            ['id'],
+            (CommentModel item) => <String, Object?>{
+                  'id': item.id,
+                  'ownerId': item.ownerId,
+                  'rating': item.rating,
+                  'comment': item.comment,
+                  'ownerName': item.ownerName,
+                  'ownerImageFilePath': item.ownerImageFilePath
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<CommentModel> _commentModelInsertionAdapter;
+
+  final DeletionAdapter<CommentModel> _commentModelDeletionAdapter;
+
+  @override
+  Future<List<CommentModel>> getAllComments() async {
+    return _queryAdapter.queryList('SELECT * FROM CommentModel',
+        mapper: (Map<String, Object?> row) => CommentModel(
+            id: row['id'] as int?,
+            ownerId: row['ownerId'] as int,
+            rating: row['rating'] as double,
+            comment: row['comment'] as String,
+            ownerName: row['ownerName'] as String,
+            ownerImageFilePath: row['ownerImageFilePath'] as String?));
+  }
+
+  @override
+  Future<void> updateCommentsOwnerName(
+    String newOwnerName,
+    int ownerId,
+  ) async {
+    await _queryAdapter.queryNoReturn(
+        'Update CommentModel Set ownerName = ?1 Where ownerId = ?2',
+        arguments: [newOwnerName, ownerId]);
+  }
+
+  @override
+  Future<void> insertComment(CommentModel person) async {
+    await _commentModelInsertionAdapter.insert(
+        person, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteComment(CommentModel person) async {
+    await _commentModelDeletionAdapter.delete(person);
   }
 }

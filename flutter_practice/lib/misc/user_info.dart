@@ -1,10 +1,11 @@
 import '../repository/models/user_model.dart';
 
 class UserInfo {
-  static UserModel? loggedInUser;
+  static UserModel? _loggedInUser;
+  static UserModel? get loggedInUser => _loggedInUser;
   static bool get isLoggedIn => loggedInUser != null;
 
-  static void saveLoggenInUser(UserModel newUser) => loggedInUser = newUser;
+  static void saveLoggenInUser(UserModel newUser) => _loggedInUser = newUser;
 
-  static void clearLoggedInUser() => loggedInUser = null;
+  static void clearLoggedInUser() => _loggedInUser = null;
 }

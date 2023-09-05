@@ -4,9 +4,9 @@ import 'package:floor/floor.dart';
 class UserModel {
   @PrimaryKey(autoGenerate: true)
   int? id;
-  final String email;
-  final String password;
-  final String username;
+  String email;
+  String password;
+  String username;
 
   UserModel(
       {this.id,

@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_practice/cubit/cubits/login_cubit.dart';
 import 'package:flutter_practice/cubit/states/login_state.dart';
-import 'package:flutter_practice/ui/pages/text_to_speach_page.dart';
+import 'package:flutter_practice/ui/pages/main_page.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
-import '../../misc/constants.dart';
+import '../../misc/app_colors.dart';
+import '../../misc/app_fonts.dart';
 import 'create_account_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,149 +22,213 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with AfterLayoutMixin<LoginPage> {
-  final LoginCubit cubit = LoginCubit();
+  final _cubit = LoginCubit();
   final _loginTextFieldController = TextEditingController();
   final _passwordTexFieldController = TextEditingController();
+  bool _shouldHidePassword = true;
+  bool _shouldRememberLogin = false;
 
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
-    final prefferences = await SharedPreferences.getInstance();
-    final savedEmail =
-        prefferences.getString(Constants.autoLoginEmailPreffName);
+    var isLoginSuccessful = await _cubit.tryLoginBySavedEmail();
 
-    if (savedEmail != null) {
-      var isLoginSuccessful = await cubit.loginByEmail(savedEmail);
-
-      if (isLoginSuccessful) {
-        Get.to(const TextToSpeachPage());
-      }
+    if (isLoginSuccessful) {
+      Get.offAll(() => const MainPage());
     }
   }
 
   @override
+  void dispose() {
+    _loginTextFieldController.dispose();
+    _passwordTexFieldController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
-          title: Text('loginToYourAccount'.tr),
-        ),
+        resizeToAvoidBottomInset: false,
+        backgroundColor: AppColors.backgroundWhite,
         body: Padding(
-          padding: const EdgeInsets.all(40),
+          padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
           child: BlocConsumer<LoginCubit, LoginState>(
             listener: _loginPageConsumerListener,
-            bloc: cubit,
+            bloc: _cubit,
             builder: _loginPageConsumerBuilder,
           ),
         ),
       );
 
   Widget _loginPageConsumerBuilder(BuildContext context, LoginState state) =>
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            controller: _loginTextFieldController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              hintText: 'email'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: _passwordTexFieldController,
-            obscureText: state.shouldHidePassword,
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                icon: Icon(
-                    state.shouldHidePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: Colors.deepPurpleAccent),
-                onPressed: () => _onHidePasswordPressed(state),
-              ),
-              hintText: 'password'.tr,
-              hintStyle: const TextStyle(color: Colors.black54),
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: Colors.deepPurple, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                      color: Colors.deepPurpleAccent, width: 2),
-                  borderRadius: BorderRadius.circular(10.0)),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
+      Stack(children: [
+        Visibility(
+            visible: state.isLoading,
+            child: const Center(
+              child: LoadingIndicator(
+                  colors: [AppColors.backgroundBlack],
+                  indicatorType: Indicator.ballClipRotateMultiple),
+            )),
+        Opacity(
+          opacity: state.isLoading ? 0.4 : 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Checkbox(
-                  activeColor: Colors.deepPurple,
-                  checkColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  side: const BorderSide(color: Colors.deepPurple, width: 2),
-                  value: state.shouldRememberLogin,
-                  onChanged: _onRememberMeChecked),
-              Text('rememberMe'.tr),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('logIntoYourAccount'.tr,
+                    style: const TextStyle(
+                        color: AppColors.textBlack,
+                        fontFamily: AppFonts.productSans,
+                        fontSize: 24,
+                        height: 2,
+                        fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(height: 70),
+              TextField(
+                controller: _loginTextFieldController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: 'emailAdress'.tr,
+                  hintStyle: const TextStyle(
+                      color: AppColors.disabledGrey,
+                      fontFamily: AppFonts.productSans,
+                      fontSize: 16),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.separatorGrey),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.separatorGrey),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              TextField(
+                controller: _passwordTexFieldController,
+                obscureText: _shouldHidePassword,
+                keyboardType: _shouldHidePassword
+                    ? TextInputType.text
+                    : TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        _shouldHidePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: AppColors.iconGrey),
+                    onPressed: _onHidePasswordPressed,
+                  ),
+                  hintText: 'password'.tr,
+                  hintStyle: const TextStyle(
+                      color: AppColors.disabledGrey,
+                      fontFamily: AppFonts.productSans,
+                      fontSize: 16),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.separatorGrey),
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: AppColors.separatorGrey),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(
+                        activeColor: AppColors.backgroundBlack,
+                        checkColor: AppColors.backgroundWhite,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        value: _shouldRememberLogin,
+                        onChanged: _onRememberMeChecked),
+                  ),
+                  const SizedBox(width: 10),
+                  Text('rememberMe'.tr,
+                      style: const TextStyle(
+                          color: AppColors.textBlack,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16)),
+                ],
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: _onLoginPressed,
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.backgroundBlack,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                    )),
+                child: Text('logInCaps'.tr,
+                    style: const TextStyle(
+                        color: AppColors.backgroundWhite,
+                        fontFamily: AppFonts.productSans,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18)),
+              ),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('dontHaveAnAccount'.tr,
+                      style: const TextStyle(
+                          color: AppColors.textBlack,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16)),
+                  TextButton(
+                      onPressed: _onCreateAccountPressed,
+                      child: Text('signUp'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textBlack,
+                              decoration: TextDecoration.underline,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 16))),
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _onLoginPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-            ),
-            child: Text('login'.tr),
-          ),
-          ElevatedButton(
-            onPressed: _onCreateAccountPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.deepPurple,
-            ),
-            child: Text('createAnAccount'.tr),
-          ),
-        ],
-      );
+        ),
+      ]);
 
   void _loginPageConsumerListener(
       BuildContext context, LoginState state) async {
-    if (state.isloginSuccessful) {
-      final prefferences = await SharedPreferences.getInstance();
-
-      prefferences.setString(
-          Constants.autoLoginEmailPreffName, _loginTextFieldController.text);
-
-      await Get.to(const TextToSpeachPage());
-
-      _loginTextFieldController.text = "";
-      _passwordTexFieldController.text = "";
-    } else if (state.errorText != null) {
+    if (state.errorText != null) {
       Get.snackbar('error'.tr, state.errorText!);
     }
   }
 
-  void _onHidePasswordPressed(LoginState state) =>
-      cubit.setShouldHidePassword(!state.shouldHidePassword);
+  void _onHidePasswordPressed() =>
+      setState(() => _shouldHidePassword = !_shouldHidePassword);
 
   void _onRememberMeChecked(bool? checked) =>
-      cubit.setShouldRememberLogin(checked!);
+      setState(() => _shouldRememberLogin = checked!);
 
-  void _onLoginPressed() => cubit.login(
-      _loginTextFieldController.text, _passwordTexFieldController.text);
+  Future _onLoginPressed() async {
+    var isLoggedIn = await _cubit.login(_loginTextFieldController.text,
+        _passwordTexFieldController.text, _shouldRememberLogin);
+
+    if (isLoggedIn) {
+      await Get.offAll(() => const MainPage());
+
+      _clearFields();
+    }
+  }
 
   void _onCreateAccountPressed() async {
+    _clearFields();
+
     var navigationResult = await Get.to(const CreateAccountPage());
 
     if (navigationResult != null) {
       _loginTextFieldController.text = navigationResult;
     }
+  }
+
+  void _clearFields() {
+    _passwordTexFieldController.text = "";
+    _loginTextFieldController.text = "";
   }
 }
