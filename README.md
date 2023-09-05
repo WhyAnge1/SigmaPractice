@@ -1,13 +1,15 @@
 # SigmaPractice
 Flutter practice project using Cubit architecture
 
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/75380d7b-d4a5-4b51-8876-7cf623451bb3) 
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/75e1c172-7937-4cca-ba5b-3ab9ddd568ca)
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/9ebcc86a-8cef-4612-bccc-ca3d47a25eaf)
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/6b3aa40a-82d7-45e2-9cdc-ddd1bd03f4bb)
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/07a45627-7a4a-4fa6-b0a4-1d9d09c3454d) 
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/60d8382f-092e-4527-a25b-d1798e63460e)
-![image](https://github.com/WhyAnge1/flutter-practice/assets/47815470/196f5875-a558-415f-8f44-abd557b85b66)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/18244579-d0cc-4b21-9ea3-15e1583d9637)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/723aa197-f9d9-47b3-9c2f-5ad1400169a6)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/3a335c2d-34e5-448b-b828-4115f70af302)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/02dd82bb-6f8a-47af-83d0-642be33ac2dc)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/361472f2-f2e0-40d4-89ee-272611728086)
+![image](https://github.com/WhyAnge1/SigmaPractice/assets/47815470/80ff9e0d-26af-4242-92ee-7b85df13c618)
+
+
+
 
 
 
