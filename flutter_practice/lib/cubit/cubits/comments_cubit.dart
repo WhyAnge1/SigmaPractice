@@ -1,87 +1,65 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/services/comments_service.dart';
 import 'package:flutter_practice/repository/models/comment_model.dart';
 import 'package:get/get.dart';
-import '../../misc/constants.dart';
 import '../../misc/user_info.dart';
-import '../../repository/repositories/database.dart';
-import '../../misc/comments_state.dart';
+import '../states/comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
-  List<CommentModel> _comments = List<CommentModel>.empty(growable: true);
+  final _commentsService = CommentsService();
 
-  CommentsCubit() : super(CommentsState());
+  CommentsCubit() : super(InitialCommentsState());
 
   Future loadComments() async {
-    MobileDatabase? database;
+    var newCommentsResult = await _commentsService.getSavedComments();
 
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      _comments = await database.commentDao.getAllComments();
-
-      _emit();
-    } catch (ex) {
-      _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-    } finally {
-      database?.close();
+    if (newCommentsResult.isSucceed) {
+      if (newCommentsResult.result!.isNotEmpty) {
+        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      } else {
+        emit(NoDataCommentsState());
+      }
+    } else {
+      emit(ErrorCommentsState(errorMesage: 'systemErrorPleaseContactUs'.tr));
     }
   }
 
   Future deleteComment(CommentModel commentToDelete) async {
-    MobileDatabase? database;
+    var newCommentsResult =
+        await _commentsService.deleteComment(commentToDelete);
 
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      await database.commentDao.deleteComment(commentToDelete);
-      _comments.remove(commentToDelete);
-
-      _emit();
-    } catch (ex) {
-      _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-    } finally {
-      database?.close();
+    if (newCommentsResult.isSucceed) {
+      if (newCommentsResult.result!.isNotEmpty) {
+        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      } else {
+        emit(NoDataCommentsState());
+      }
+    } else {
+      emit(ErrorCommentsState(errorMesage: 'systemErrorPleaseContactUs'.tr));
     }
   }
 
   Future saveComment(String comment, double rating) async {
-    MobileDatabase? database;
-
     if (rating < 0.0 && rating > 5.0) {
       throw ArgumentError("Rating value can be from 0.0 to 5.0");
     }
 
     if (comment.isEmpty) {
-      _emit(errorText: "Comment filed can't be empty");
-
-      return;
-    }
-
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
+      emit(ErrorCommentsState(errorMesage: 'commentFieldCanNotBeEmpty'.tr));
+    } else {
       final newComment = CommentModel(
           ownerId: UserInfo.loggedInUser!.id!,
           comment: comment,
           rating: rating,
           ownerName: UserInfo.loggedInUser!.username);
-      await database.commentDao.insertComment(newComment);
-      _comments.add(newComment);
 
-      _emit();
-    } catch (ex) {
-      _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-    } finally {
-      database?.close();
+      var newCommentsResult = await _commentsService.saveComment(newComment);
+
+      if (newCommentsResult.isSucceed) {
+        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      } else {
+        emit(ErrorCommentsState(errorMesage: 'systemErrorPleaseContactUs'.tr));
+      }
     }
   }
-
-  void _emit({String? errorText}) =>
-      emit(CommentsState(comments: _comments, errorText: errorText));
 }

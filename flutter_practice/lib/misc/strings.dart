@@ -10,7 +10,7 @@ class Strings extends Translations {
           'createYourAccount': 'Create your account',
           'noCommentsYet' : 'No comments yet',
           'comments' : 'Comments',
-          'pullUpToShareFeedback' :'"Pull up to share with us your feedback',
+          'pullUpToShareFeedback' :'Pull up to share with us your feedback',
           'typeYourCommentHere' : 'Type your comment here...',
           'createYourAccountTitle': 'Create \nyour account',
           'alreadyHaveAnAccount': 'Already have an account?',
@@ -31,6 +31,7 @@ class Strings extends Translations {
           'accountFor': 'Account for',
           'createdSuccessfully': 'created successfully',
           'emailExistError': 'User with this email adress is already exist',
+          'commentFieldCanNotBeEmpty' : "Comment field can't be empty",
           'systemErrorPleaseContactUs':
               'System error occurred! Please contact us if this error persist',
           'emptyUsernameError': 'Username must not be empty!',

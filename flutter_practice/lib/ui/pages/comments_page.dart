@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 import '../../cubit/cubits/comments_cubit.dart';
-import '../../misc/comments_state.dart';
+import '../../cubit/states/comments_state.dart';
 import '../../misc/app_colors.dart';
 import '../../misc/app_fonts.dart';
 import '../cells/comment_cell.dart';
@@ -36,6 +36,7 @@ class _CommentsPageState extends State<CommentsPage>
   @override
   void dispose() {
     _commentTextFieldController.dispose();
+    _cubit.close();
 
     super.dispose();
   }
@@ -71,51 +72,58 @@ class _CommentsPageState extends State<CommentsPage>
           color: Colors.transparent,
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: BlocConsumer<CommentsCubit, CommentsState>(
-                listener: _commentsPageConsumerListener,
-                bloc: _cubit,
-                builder: _commentsPageConsumerBuilder),
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              color: AppColors.iconGrey,
+              child: BlocConsumer<CommentsCubit, CommentsState>(
+                  listener: _commentsPageConsumerListener,
+                  buildWhen: (previous, current) => current.shouldBuild,
+                  bloc: _cubit,
+                  builder: (context, state) {
+                    if (state is LoadedCommentsState) {
+                      return _constructCommentsList(state.comments);
+                    } else {
+                      return _constructNoDataState();
+                    }
+                  }),
+            ),
           ),
         ),
       );
 
-  Widget _commentsPageConsumerBuilder(
-          BuildContext context, CommentsState state) =>
-      RefreshIndicator(
-          onRefresh: _onRefresh,
-          color: AppColors.iconGrey,
-          child: state.comments?.isEmpty ?? true
-              ? SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Center(
-                    child: Column(children: [
-                      const SizedBox(height: 100),
-                      const Icon(
-                        Icons.speaker_notes_off,
-                        color: AppColors.iconGrey,
-                        size: 80,
-                      ),
-                      const SizedBox(height: 30),
-                      Text('noCommentsYet'.tr,
-                          style: const TextStyle(
-                              color: AppColors.iconGrey,
-                              fontFamily: AppFonts.productSans,
-                              fontSize: 18)),
-                      const SizedBox(height: 200)
-                    ]),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: state.comments!.length,
-                  itemBuilder: (BuildContext context, int index) =>
-                      CommentCell(state.comments![index], _onCommentDelete)));
+  Widget _constructNoDataState() => SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Center(
+          child: Column(children: [
+            const SizedBox(height: 100),
+            const Icon(
+              Icons.speaker_notes_off,
+              color: AppColors.iconGrey,
+              size: 80,
+            ),
+            const SizedBox(height: 30),
+            Text('noCommentsYet'.tr,
+                style: const TextStyle(
+                    color: AppColors.iconGrey,
+                    fontFamily: AppFonts.productSans,
+                    fontSize: 18)),
+            const SizedBox(height: 200)
+          ]),
+        ),
+      );
+
+  Widget _constructCommentsList(List<CommentModel> comments) =>
+      ListView.builder(
+          itemCount: comments.length,
+          itemBuilder: (BuildContext context, int index) =>
+              CommentCell(comments[index], _onCommentDelete));
 
   Future _onRefresh() async => await _cubit.loadComments();
 
   void _commentsPageConsumerListener(
       BuildContext context, CommentsState state) {
-    if (state.errorText != null) {
-      Get.snackbar('error'.tr, state.errorText!);
+    if (state is ErrorCommentsState) {
+      Get.snackbar('error'.tr, state.errorMesage);
     }
   }
 

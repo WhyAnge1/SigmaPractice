@@ -23,7 +23,7 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
 
   @override
   void dispose() {
-    _cubit.dispose();
+    _cubit.close();
 
     super.dispose();
   }

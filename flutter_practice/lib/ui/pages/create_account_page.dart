@@ -28,6 +28,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _emailTextFieldController.dispose();
     _passwordTexFieldController.dispose();
     _confirmPasswordTexFieldController.dispose();
+    _cubit.close();
 
     super.dispose();
   }

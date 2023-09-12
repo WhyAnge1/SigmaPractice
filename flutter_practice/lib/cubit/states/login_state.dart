@@ -1,10 +1,15 @@
 import 'dart:core';
 
-class LoginState {
-  String? errorText;
-  bool isLoading;
+abstract class LoginState {}
 
-  LoginState(
-      {this.errorText,
-      this.isLoading = false});
+class ErrorLoginState extends LoginState {
+  final String errorMesage;
+
+  ErrorLoginState({required this.errorMesage});
 }
+
+class LoadingLoginState extends LoginState {}
+
+class LoggedInLoginState extends LoginState {}
+
+class InitialLoginState extends LoginState {}
