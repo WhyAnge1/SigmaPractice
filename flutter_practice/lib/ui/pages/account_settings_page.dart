@@ -30,6 +30,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
   bool _shouldHidePassword = true;
 
   @override
+  void dispose() {
+    _cubit.close();
+    
+    super.dispose();
+  }
+
+  @override
   void afterFirstLayout(BuildContext context) {
     var currentUser = _cubit.getCurrentUserData();
 

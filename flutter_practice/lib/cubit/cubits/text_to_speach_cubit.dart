@@ -23,9 +23,12 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
     });
   }
 
-  void dispose() {
+  @override
+  Future<void> close() {
     _apiClient.close();
     _player.dispose();
+
+    return super.close();
   }
 
   void playAudioFile() {

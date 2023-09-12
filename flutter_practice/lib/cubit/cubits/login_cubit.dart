@@ -8,13 +8,13 @@ import '../../repository/repositories/database.dart';
 import '../states/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(LoginState());
+  LoginCubit() : super(InitialLoginState());
 
   Future<bool> tryLoginBySavedEmail() async {
     MobileDatabase? database;
     bool isLoggedIn = false;
 
-    _emit(isLoading: true);
+    emit(LoadingLoginState());
 
     final prefferences = await SharedPreferences.getInstance();
     final savedEmail =
@@ -29,19 +29,19 @@ class LoginCubit extends Cubit<LoginState> {
         final foundUser = await database.userDao.findUserByEmail(savedEmail);
 
         if (foundUser == null) {
-          _emit(errorText: 'userEmailExistError'.tr);
+          emit(ErrorLoginState(errorMesage: 'userEmailExistError'.tr));
         } else {
           UserInfo.saveLoggenInUser(foundUser);
           isLoggedIn = true;
+
+          emit(LoggedInLoginState());
         }
       } catch (ex) {
-        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
+        emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
       } finally {
         database?.close();
       }
     }
-    
-    _emit();
 
     return isLoggedIn;
   }
@@ -50,7 +50,7 @@ class LoginCubit extends Cubit<LoginState> {
     MobileDatabase? database;
     bool isLoggedIn = false;
 
-    _emit(isLoading: true);
+    emit(LoadingLoginState());
 
     if (validateInputData(email, password)) {
       try {
@@ -61,7 +61,8 @@ class LoginCubit extends Cubit<LoginState> {
         final foundUser = await database.userDao.findUserByEmail(email);
 
         if (foundUser == null || foundUser.password != password) {
-          _emit(errorText: 'userNotExistOrPasswordWrongError'.tr);
+          emit(ErrorLoginState(
+              errorMesage: 'userNotExistOrPasswordWrongError'.tr));
         } else {
           UserInfo.saveLoggenInUser(foundUser);
 
@@ -71,15 +72,15 @@ class LoginCubit extends Cubit<LoginState> {
               Constants.autoLoginEmailPreffName, foundUser.email);
 
           isLoggedIn = true;
+
+          emit(LoggedInLoginState());
         }
       } catch (ex) {
-        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
+        emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
       } finally {
         database?.close();
       }
     }
-
-    _emit();
 
     return isLoggedIn;
   }
@@ -96,12 +97,9 @@ class LoginCubit extends Cubit<LoginState> {
 
     isValid = errorText == null;
     if (!isValid) {
-      _emit(errorText: errorText);
+      emit(ErrorLoginState(errorMesage: errorText));
     }
 
     return isValid;
   }
-
-  void _emit({String? errorText, bool isLoading = false}) =>
-      emit(LoginState(errorText: errorText, isLoading: isLoading));
 }
