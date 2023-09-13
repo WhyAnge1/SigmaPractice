@@ -41,161 +41,168 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.backgroundWhite,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('createYourAccountTitle'.tr,
-                    style: const TextStyle(
-                        color: AppColors.textBlack,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 24,
-                        height: 2,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 70),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextField(
-                      controller: _nameTextFieldController,
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        hintText: 'enterYourUsername'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _emailTextFieldController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'emailAdress'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _passwordTexFieldController,
-                      obscureText: _shouldHidePassword,
-                      keyboardType: _shouldHidePassword
-                          ? TextInputType.text
-                          : TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                              _shouldHidePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: AppColors.iconGrey),
-                          onPressed: _onHidePasswordPressed,
-                        ),
-                        hintText: 'password'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _confirmPasswordTexFieldController,
-                      obscureText: _shouldHidePassword,
-                      keyboardType: _shouldHidePassword
-                          ? TextInputType.text
-                          : TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                              _shouldHidePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: AppColors.iconGrey),
-                          onPressed: _onHidePasswordPressed,
-                        ),
-                        hintText: 'confirmPassword'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                        onPressed: _onCreateAccountPressed,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.backgroundBlack,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 35),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                            )),
-                        child: Text('signUpCaps'.tr,
-                            style: const TextStyle(
-                                color: AppColors.backgroundWhite,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 35, left: 20, right: 20, bottom: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                      flex: 3,
+                      fit: FlexFit.tight,
+                      child: Text('createYourAccountTitle'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textBlack,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 24,
+                              height: 2,
+                              fontWeight: FontWeight.bold))),
+                  Flexible(
+                    flex: 11,
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: _nameTextFieldController,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                            hintText: 'enterYourUsername'.tr,
+                            hintStyle: const TextStyle(
+                                color: AppColors.disabledGrey,
                                 fontFamily: AppFonts.productSans,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18))),
-                  ],
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('alreadyHaveAnAccount'.tr,
-                        style: const TextStyle(
-                            color: AppColors.textBlack,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16)),
-                    TextButton(
-                        onPressed: _onLogInPressed,
-                        child: Text('logIn'.tr,
-                            style: const TextStyle(
-                                color: AppColors.textBlack,
-                                decoration: TextDecoration.underline,
+                                fontSize: 16),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        TextField(
+                          controller: _emailTextFieldController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            hintText: 'emailAdress'.tr,
+                            hintStyle: const TextStyle(
+                                color: AppColors.disabledGrey,
                                 fontFamily: AppFonts.productSans,
-                                fontSize: 16))),
-                  ],
-                ),
-              ],
+                                fontSize: 16),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        TextField(
+                          controller: _passwordTexFieldController,
+                          obscureText: _shouldHidePassword,
+                          keyboardType: _shouldHidePassword
+                              ? TextInputType.text
+                              : TextInputType.visiblePassword,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                  _shouldHidePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: AppColors.iconGrey),
+                              onPressed: _onHidePasswordPressed,
+                            ),
+                            hintText: 'password'.tr,
+                            hintStyle: const TextStyle(
+                                color: AppColors.disabledGrey,
+                                fontFamily: AppFonts.productSans,
+                                fontSize: 16),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        TextField(
+                          controller: _confirmPasswordTexFieldController,
+                          obscureText: _shouldHidePassword,
+                          keyboardType: _shouldHidePassword
+                              ? TextInputType.text
+                              : TextInputType.visiblePassword,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                  _shouldHidePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: AppColors.iconGrey),
+                              onPressed: _onHidePasswordPressed,
+                            ),
+                            hintText: 'confirmPassword'.tr,
+                            hintStyle: const TextStyle(
+                                color: AppColors.disabledGrey,
+                                fontFamily: AppFonts.productSans,
+                                fontSize: 16),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: AppColors.separatorGrey),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        ElevatedButton(
+                            onPressed: _onCreateAccountPressed,
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.backgroundBlack,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 35),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                )),
+                            child: Text('signUpCaps'.tr,
+                                style: const TextStyle(
+                                    color: AppColors.backgroundWhite,
+                                    fontFamily: AppFonts.productSans,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18))),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('alreadyHaveAnAccount'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textBlack,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 16)),
+                      TextButton(
+                          onPressed: _onLogInPressed,
+                          child: Text('logIn'.tr,
+                              style: const TextStyle(
+                                  color: AppColors.textBlack,
+                                  decoration: TextDecoration.underline,
+                                  fontFamily: AppFonts.productSans,
+                                  fontSize: 16))),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

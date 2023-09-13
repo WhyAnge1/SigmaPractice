@@ -54,144 +54,152 @@ class _LoginPageState extends State<LoginPage>
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: AppColors.backgroundWhite,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
-            child: Stack(children: [
-              Visibility(
-                  visible: _shouldShowLoader,
-                  child: const Center(
-                    child: LoadingIndicator(
-                        colors: [AppColors.backgroundBlack],
-                        indicatorType: Indicator.ballClipRotateMultiple),
-                  )),
-              Opacity(
-                opacity: _shouldShowLoader ? 0.4 : 1,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('logIntoYourAccount'.tr,
-                          style: const TextStyle(
-                              color: AppColors.textBlack,
-                              fontFamily: AppFonts.productSans,
-                              fontSize: 24,
-                              height: 2,
-                              fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(height: 70),
-                    TextField(
-                      controller: _loginTextFieldController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'emailAdress'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: _passwordTexFieldController,
-                      obscureText: _shouldHidePassword,
-                      keyboardType: _shouldHidePassword
-                          ? TextInputType.text
-                          : TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                              _shouldHidePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              color: AppColors.iconGrey),
-                          onPressed: _onHidePasswordPressed,
-                        ),
-                        hintText: 'password'.tr,
-                        hintStyle: const TextStyle(
-                            color: AppColors.disabledGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 16),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: AppColors.separatorGrey),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: Checkbox(
-                              activeColor: AppColors.backgroundBlack,
-                              checkColor: AppColors.backgroundWhite,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5)),
-                              value: _shouldRememberLogin,
-                              onChanged: _onRememberMeChecked),
-                        ),
-                        const SizedBox(width: 10),
-                        Text('rememberMe'.tr,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 35, left: 20, right: 20, bottom: 5),
+              child: Stack(children: [
+                Visibility(
+                    visible: _shouldShowLoader,
+                    child: const Center(
+                      child: LoadingIndicator(
+                          colors: [AppColors.backgroundBlack],
+                          indicatorType: Indicator.ballClipRotateMultiple),
+                    )),
+                Opacity(
+                  opacity: _shouldShowLoader ? 0.4 : 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: 3,
+                        fit: FlexFit.tight,
+                        child: Text('logIntoYourAccount'.tr,
                             style: const TextStyle(
                                 color: AppColors.textBlack,
                                 fontFamily: AppFonts.productSans,
-                                fontSize: 16)),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: _onLoginPressed,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.backgroundBlack,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 35),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                          )),
-                      child: Text('logInCaps'.tr,
-                          style: const TextStyle(
-                              color: AppColors.backgroundWhite,
-                              fontFamily: AppFonts.productSans,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18)),
-                    ),
-                    const Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('dontHaveAnAccount'.tr,
-                            style: const TextStyle(
-                                color: AppColors.textBlack,
-                                fontFamily: AppFonts.productSans,
-                                fontSize: 16)),
-                        TextButton(
-                            onPressed: _onCreateAccountPressed,
-                            child: Text('signUp'.tr,
+                                fontSize: 24,
+                                height: 2,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                      Flexible(
+                        flex: 13,
+                        child: Column(children: [
+                          TextField(
+                            controller: _loginTextFieldController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              hintText: 'emailAdress'.tr,
+                              hintStyle: const TextStyle(
+                                  color: AppColors.disabledGrey,
+                                  fontFamily: AppFonts.productSans,
+                                  fontSize: 16),
+                              enabledBorder: const UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: AppColors.separatorGrey),
+                              ),
+                              focusedBorder: const UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: AppColors.separatorGrey),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          TextField(
+                            controller: _passwordTexFieldController,
+                            obscureText: _shouldHidePassword,
+                            keyboardType: _shouldHidePassword
+                                ? TextInputType.text
+                                : TextInputType.visiblePassword,
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                    _shouldHidePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                    color: AppColors.iconGrey),
+                                onPressed: _onHidePasswordPressed,
+                              ),
+                              hintText: 'password'.tr,
+                              hintStyle: const TextStyle(
+                                  color: AppColors.disabledGrey,
+                                  fontFamily: AppFonts.productSans,
+                                  fontSize: 16),
+                              enabledBorder: const UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: AppColors.separatorGrey),
+                              ),
+                              focusedBorder: const UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: AppColors.separatorGrey),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Checkbox(
+                                    activeColor: AppColors.backgroundBlack,
+                                    checkColor: AppColors.backgroundWhite,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5)),
+                                    value: _shouldRememberLogin,
+                                    onChanged: _onRememberMeChecked),
+                              ),
+                              const SizedBox(width: 10),
+                              Text('rememberMe'.tr,
+                                  style: const TextStyle(
+                                      color: AppColors.textBlack,
+                                      fontFamily: AppFonts.productSans,
+                                      fontSize: 16)),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: _onLoginPressed,
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.backgroundBlack,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 35),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                )),
+                            child: Text('logInCaps'.tr,
                                 style: const TextStyle(
-                                    color: AppColors.textBlack,
-                                    decoration: TextDecoration.underline,
+                                    color: AppColors.backgroundWhite,
                                     fontFamily: AppFonts.productSans,
-                                    fontSize: 16))),
-                      ],
-                    ),
-                  ],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18)),
+                          ),
+                          const Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('dontHaveAnAccount'.tr,
+                                  style: const TextStyle(
+                                      color: AppColors.textBlack,
+                                      fontFamily: AppFonts.productSans,
+                                      fontSize: 16)),
+                              TextButton(
+                                  onPressed: _onCreateAccountPressed,
+                                  child: Text('signUp'.tr,
+                                      style: const TextStyle(
+                                          color: AppColors.textBlack,
+                                          decoration: TextDecoration.underline,
+                                          fontFamily: AppFonts.productSans,
+                                          fontSize: 16))),
+                            ],
+                          )
+                        ]),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+              ]),
+            ),
           ),
         ),
       );

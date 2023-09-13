@@ -24,32 +24,50 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: AppColors.backgroundWhite,
-            border: Border.all(color: AppColors.unselectedGrey),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: TabBar(
-            indicatorColor: Colors.transparent,
-            labelColor: AppColors.textBlack,
-            unselectedLabelColor: AppColors.unselectedGrey,
-            controller: _tabController,
-            tabs: const [
-              Tab(icon: Icon(Icons.speaker)),
-              Tab(icon: Icon(Icons.rate_review)),
-              Tab(icon: Icon(Icons.brush_outlined)),
+        backgroundColor: AppColors.backgroundWhite,
+        bottomNavigationBar: SafeArea(
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.unselectedGrey),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: TabBar(
+                  indicatorColor: Colors.transparent,
+                  labelColor: AppColors.textBlack,
+                  unselectedLabelColor: AppColors.unselectedGrey,
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(icon: Icon(Icons.speaker)),
+                    Tab(icon: Icon(Icons.rate_review)),
+                    Tab(icon: Icon(Icons.brush_outlined)),
+                  ],
+                ),
+              ),
+              Positioned(
+                height: 2,
+                bottom: 0,
+                right: 0,
+                left: 0,
+                child: Container(
+                  color: AppColors.backgroundWhite,
+                ),
+              ),
             ],
           ),
         ),
-        body: TabBarView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _tabController,
-          children: const [
-            TextToSpeachPage(),
-            CommentsPage(),
-            SpiderStarsPage()
-          ],
+        body: SafeArea(
+          child: TabBarView(
+            physics: const NeverScrollableScrollPhysics(),
+            controller: _tabController,
+            children: const [
+              TextToSpeachPage(),
+              CommentsPage(),
+              SpiderStarsPage()
+            ],
+          ),
         ),
       );
 }

@@ -50,7 +50,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
         listener: _accountSettingsPageConsumerListener,
         bloc: _cubit,
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
+          backgroundColor: AppColors.backgroundWhite,
           appBar: AppBar(
             actions: [
               IconButton(
@@ -77,205 +77,208 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
                   color: AppColors.textBlack,
                 )),
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('username'.tr,
-                      style: const TextStyle(
-                          color: AppColors.helpTextGrey,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 40, bottom: 5),
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('username'.tr,
+                        style: const TextStyle(
+                            color: AppColors.helpTextGrey,
+                            fontFamily: AppFonts.productSans,
+                            fontSize: 14)),
+                  ),
+                  TextField(
+                    controller: _nameTextFieldController,
+                    keyboardType: TextInputType.name,
+                    decoration: InputDecoration(
+                      hintText: 'enterYourUsername'.tr,
+                      hintStyle: const TextStyle(
+                          color: AppColors.disabledGrey,
                           fontFamily: AppFonts.productSans,
-                          fontSize: 14)),
-                ),
-                TextField(
-                  controller: _nameTextFieldController,
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    hintText: 'enterYourUsername'.tr,
-                    hintStyle: const TextStyle(
-                        color: AppColors.disabledGrey,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 16),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
+                          fontSize: 16),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 40),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('email'.tr,
-                        style: const TextStyle(
-                            color: AppColors.helpTextGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 14))),
-                TextField(
-                  controller: _emailTextFieldController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    hintText: 'enterYourEmail'.tr,
-                    hintStyle: const TextStyle(
-                        color: AppColors.disabledGrey,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 16),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 80),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('oldPassword'.tr,
-                        style: const TextStyle(
-                            color: AppColors.helpTextGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 14))),
-                TextField(
-                  controller: _oldPasswordTexFieldController,
-                  obscureText: _shouldHidePassword,
-                  keyboardType: _shouldHidePassword
-                      ? TextInputType.text
-                      : TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _shouldHidePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: AppColors.iconGrey),
-                      onPressed: _onHidePasswordPressed,
-                    ),
-                    hintText: 'enterOldPassword'.tr,
-                    hintStyle: const TextStyle(
-                        color: AppColors.disabledGrey,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 16),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('newPassword'.tr,
-                        style: const TextStyle(
-                            color: AppColors.helpTextGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 14))),
-                TextField(
-                  controller: _newPasswordTexFieldController,
-                  obscureText: _shouldHidePassword,
-                  keyboardType: _shouldHidePassword
-                      ? TextInputType.text
-                      : TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _shouldHidePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: AppColors.iconGrey),
-                      onPressed: _onHidePasswordPressed,
-                    ),
-                    hintText: 'enterNewPassword'.tr,
-                    hintStyle: const TextStyle(
-                        color: AppColors.disabledGrey,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 16),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('confirmPassword'.tr,
-                        style: const TextStyle(
-                            color: AppColors.helpTextGrey,
-                            fontFamily: AppFonts.productSans,
-                            fontSize: 14))),
-                TextField(
-                  controller: _confirmNewPasswordTexFieldController,
-                  obscureText: _shouldHidePassword,
-                  keyboardType: _shouldHidePassword
-                      ? TextInputType.text
-                      : TextInputType.visiblePassword,
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          _shouldHidePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: AppColors.iconGrey),
-                      onPressed: _onHidePasswordPressed,
-                    ),
-                    hintText: 'confirmNewPassword'.tr,
-                    hintStyle: const TextStyle(
-                        color: AppColors.disabledGrey,
-                        fontFamily: AppFonts.productSans,
-                        fontSize: 16),
-                    enabledBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                    focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColors.separatorGrey),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: _onSavePressed,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.backgroundBlack,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 35),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.0),
-                      )),
-                  child: Text('save'.tr,
-                      style: const TextStyle(
-                          color: AppColors.backgroundWhite,
+                  const SizedBox(height: 40),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('email'.tr,
+                          style: const TextStyle(
+                              color: AppColors.helpTextGrey,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 14))),
+                  TextField(
+                    controller: _emailTextFieldController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      hintText: 'enterYourEmail'.tr,
+                      hintStyle: const TextStyle(
+                          color: AppColors.disabledGrey,
                           fontFamily: AppFonts.productSans,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18)),
-                ),
-                const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('tiredOfOurApp'.tr,
+                          fontSize: 16),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 80),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('oldPassword'.tr,
+                          style: const TextStyle(
+                              color: AppColors.helpTextGrey,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 14))),
+                  TextField(
+                    controller: _oldPasswordTexFieldController,
+                    obscureText: _shouldHidePassword,
+                    keyboardType: _shouldHidePassword
+                        ? TextInputType.text
+                        : TextInputType.visiblePassword,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                            _shouldHidePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.iconGrey),
+                        onPressed: _onHidePasswordPressed,
+                      ),
+                      hintText: 'enterOldPassword'.tr,
+                      hintStyle: const TextStyle(
+                          color: AppColors.disabledGrey,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('newPassword'.tr,
+                          style: const TextStyle(
+                              color: AppColors.helpTextGrey,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 14))),
+                  TextField(
+                    controller: _newPasswordTexFieldController,
+                    obscureText: _shouldHidePassword,
+                    keyboardType: _shouldHidePassword
+                        ? TextInputType.text
+                        : TextInputType.visiblePassword,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                            _shouldHidePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.iconGrey),
+                        onPressed: _onHidePasswordPressed,
+                      ),
+                      hintText: 'enterNewPassword'.tr,
+                      hintStyle: const TextStyle(
+                          color: AppColors.disabledGrey,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('confirmPassword'.tr,
+                          style: const TextStyle(
+                              color: AppColors.helpTextGrey,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 14))),
+                  TextField(
+                    controller: _confirmNewPasswordTexFieldController,
+                    obscureText: _shouldHidePassword,
+                    keyboardType: _shouldHidePassword
+                        ? TextInputType.text
+                        : TextInputType.visiblePassword,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                            _shouldHidePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.iconGrey),
+                        onPressed: _onHidePasswordPressed,
+                      ),
+                      hintText: 'confirmNewPassword'.tr,
+                      hintStyle: const TextStyle(
+                          color: AppColors.disabledGrey,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 16),
+                      enabledBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(color: AppColors.separatorGrey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: _onSavePressed,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.backgroundBlack,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 35),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        )),
+                    child: Text('save'.tr,
                         style: const TextStyle(
-                            color: AppColors.textBlack,
+                            color: AppColors.backgroundWhite,
                             fontFamily: AppFonts.productSans,
-                            fontSize: 16)),
-                    TextButton(
-                        onPressed: _onDeleteAccountPressed,
-                        child: Text('deleteYourAccount'.tr,
-                            style: const TextStyle(
-                                color: AppColors.backgroundRed,
-                                decoration: TextDecoration.underline,
-                                fontFamily: AppFonts.productSans,
-                                fontSize: 16))),
-                  ],
-                ),
-              ],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18)),
+                  ),
+                  const SizedBox(height: 80),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('tiredOfOurApp'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textBlack,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 16)),
+                      TextButton(
+                          onPressed: _onDeleteAccountPressed,
+                          child: Text('deleteYourAccount'.tr,
+                              style: const TextStyle(
+                                  color: AppColors.backgroundRed,
+                                  decoration: TextDecoration.underline,
+                                  fontFamily: AppFonts.productSans,
+                                  fontSize: 16))),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -284,7 +287,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
   void _accountSettingsPageConsumerListener(
       BuildContext context, AccountSettingsState state) {
     if (state is ErrorAccountSettingsState) {
-      Get.snackbar('error'.tr, state.errorMesage!);
+      Get.snackbar('error'.tr, state.errorMesage);
     }
   }
 

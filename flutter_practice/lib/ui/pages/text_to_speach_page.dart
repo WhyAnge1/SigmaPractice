@@ -35,6 +35,7 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: AppColors.backgroundWhite,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: AppColors.backgroundWhite,
         shadowColor: Colors.transparent,
