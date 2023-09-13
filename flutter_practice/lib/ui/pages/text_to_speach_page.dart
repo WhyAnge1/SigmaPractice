@@ -20,6 +20,7 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
     with AutomaticKeepAliveClientMixin {
   final _cubit = TextToSpeachCubit();
   final _textFieldController = TextEditingController();
+  bool _shouldShowLoader = false;
 
   @override
   void dispose() {
@@ -51,25 +52,17 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
               color: AppColors.textBlack,
             )),
       ),
-      body: BlocConsumer<TextToSpeachCubit, TextToSpeachState>(
-        listener: _textToSpeachPageConsumerListener,
-        bloc: _cubit,
-        builder: _textToSpeachPageConsumerBuilder,
-      ));
-
-  Widget _textToSpeachPageConsumerBuilder(
-          BuildContext context, TextToSpeachState state) =>
-      Stack(
+      body: Stack(
         children: [
           Visibility(
-              visible: state.isLoading,
+              visible: _shouldShowLoader,
               child: const Center(
                 child: LoadingIndicator(
                     colors: [AppColors.backgroundBlack],
                     indicatorType: Indicator.ballClipRotateMultiple),
               )),
           Opacity(
-            opacity: state.isLoading ? 0.4 : 1,
+            opacity: _shouldShowLoader ? 0.4 : 1,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -109,35 +102,57 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
                           fontSize: 18)),
                 ),
                 const SizedBox(height: 40),
-                IconButton(
-                  onPressed:
-                      state.isAudioExist ? () => _playPressed(state) : null,
-                  icon: Icon(
-                    state.isOnPause ? Icons.play_arrow : Icons.pause,
-                    color: state.isAudioExist
-                        ? AppColors.backgroundBlack
-                        : AppColors.disabledGrey,
-                    size: 30,
-                  ),
-                ),
+                BlocConsumer<TextToSpeachCubit, TextToSpeachState>(
+                    listener: _textToSpeachPageConsumerListener,
+                    bloc: _cubit,
+                    buildWhen: (previous, current) => current.shouldBuild,
+                    builder: (context, state) {
+                      if (state is AudioTextToSpeachState) {
+                        return IconButton(
+                          onPressed: () => _playPressed(state.isOnPause),
+                          icon: Icon(
+                            state.isOnPause ? Icons.play_arrow : Icons.pause,
+                            color: AppColors.backgroundBlack,
+                            size: 30,
+                          ),
+                        );
+                      } else {
+                        return const IconButton(
+                          onPressed: null,
+                          icon: Icon(
+                            Icons.play_arrow,
+                            color: AppColors.disabledGrey,
+                            size: 30,
+                          ),
+                        );
+                      }
+                    }),
               ]),
             ),
           ),
         ],
-      );
+      ));
 
   void _textToSpeachPageConsumerListener(
       BuildContext context, TextToSpeachState state) {
-    if (state.errorText != null) {
-      Get.snackbar('error'.tr, state.errorText!);
+    if (state is ErrorTextToSpeachState) {
+      Get.snackbar('error'.tr, state.errorMesage);
+      _setLoaderVisibility(false);
+    } else if (state is LoadingTextToSpeachState) {
+      _setLoaderVisibility(true);
+    } else {
+      _setLoaderVisibility(false);
     }
   }
+
+  void _setLoaderVisibility(bool visible) =>
+      setState(() => _shouldShowLoader = visible);
 
   Future _onAccountPressed() async => await Get.to(const AccountSettingsPage());
 
   void _onConvertPressed() =>
       _cubit.convertTextToSpeach(_textFieldController.text);
 
-  void _playPressed(TextToSpeachState state) =>
-      state.isOnPause ? _cubit.playAudioFile() : _cubit.pauseAudioFile();
+  void _playPressed(bool isOnPause) =>
+      isOnPause ? _cubit.playAudioFile() : _cubit.pauseAudioFile();
 }

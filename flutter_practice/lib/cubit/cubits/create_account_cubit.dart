@@ -1,48 +1,45 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/misc/injection_configurator.dart';
+import 'package:flutter_practice/services/user_service.dart';
 import 'package:get/get.dart';
 
 import '../../misc/constants.dart';
-import '../../repository/models/user_model.dart';
-import '../../repository/repositories/database.dart';
 import '../states/create_account_state.dart';
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
-  CreateAccountCubit() : super(CreateAccountState());
+  final _userService = getIt<UserService>();
+
+  CreateAccountCubit() : super(InitialCreateAccountState());
 
   Future<bool> createAccount(String username, String email, String password,
       String confirmPassword) async {
-    MobileDatabase? database;
     bool isAccountCreated = false;
 
-    if (validateInputData(username, email, password, confirmPassword)) {
-      try {
-        database = await $FloorMobileDatabase
-            .databaseBuilder(Constants.databaseFileName)
-            .build();
+    if (_validateInputData(username, email, password, confirmPassword)) {
+      var existResult = await _userService.getUserByEmail(email);
 
-        final existUser = await database.userDao.findUserByEmail(email);
+      if (existResult.isSuccessHasNoResult) {
+        var saveResult = await _userService.saveUser(email, username, password);
 
-        if (existUser != null) {
-          _emit(errorText: 'emailExistError'.tr);
-        } else {
-          final newUser =
-              UserModel(username: username, email: email, password: password);
-          await database.userDao.insertUser(newUser);
-
+        if (saveResult.isSucceed) {
           isAccountCreated = true;
+        } else {
+          emit(ErrorCreateAccountState(
+              errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
-      } catch (ex) {
-        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-      } finally {
-        database?.close();
+      } else if (existResult.hasResult) {
+        emit(ErrorCreateAccountState(errorMesage: 'emailExistError'.tr));
+      } else {
+        emit(ErrorCreateAccountState(
+            errorMesage: 'systemErrorPleaseContactUs'.tr));
       }
     }
 
     return isAccountCreated;
   }
 
-  bool validateInputData(
+  bool _validateInputData(
       String username, String email, String password, String confirmPassword) {
     var isValid = true;
     String? errorText;
@@ -61,12 +58,9 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
 
     isValid = errorText == null;
     if (!isValid) {
-      _emit(errorText: errorText);
+      emit(ErrorCreateAccountState(errorMesage: errorText));
     }
 
     return isValid;
   }
-
-  void _emit({String? errorText}) =>
-      emit(CreateAccountState(errorText: errorText));
 }

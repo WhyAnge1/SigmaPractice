@@ -48,14 +48,14 @@ class _LoginPageState extends State<LoginPage>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: AppColors.backgroundWhite,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
-          child: BlocListener<LoginCubit, LoginState>(
-            listener: _loginPageConsumerListener,
-            bloc: _cubit,
+  Widget build(BuildContext context) => BlocListener<LoginCubit, LoginState>(
+        listener: _loginPageConsumerListener,
+        bloc: _cubit,
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: AppColors.backgroundWhite,
+          body: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
             child: Stack(children: [
               Visibility(
                   visible: _shouldShowLoader,

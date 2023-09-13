@@ -1,43 +1,24 @@
+import 'package:flutter_practice/helpers/result.dart';
+import 'package:flutter_practice/misc/constants.dart';
+import 'package:flutter_practice/repository/models/user_model.dart';
+import 'package:flutter_practice/repository/repositories/database.dart';
 import 'package:injectable/injectable.dart';
 
-import '../helpers/result.dart';
-import '../misc/constants.dart';
-import '../repository/models/comment_model.dart';
-import '../repository/repositories/database.dart';
-
 @injectable
-class CommentsService {
-  Future<Result<List<CommentModel>>> getSavedComments() async {
+class UserService {
+  Future<Result> saveUser(
+      String email, String username, String password) async {
     MobileDatabase? database;
-    Result<List<CommentModel>> result;
+    Result result;
 
     try {
       database = await $FloorMobileDatabase
           .databaseBuilder(Constants.databaseFileName)
           .build();
 
-      var comments = await database.commentDao.getAllComments();
-
-      result = Result.fromResult(comments);
-    } catch (ex) {
-      result = Result.fromError(ex);
-    } finally {
-      database?.close();
-    }
-
-    return result;
-  }
-
-  Future<Result> saveComment(CommentModel commentToSave) async {
-    MobileDatabase? database;
-    Result<List<CommentModel>> result;
-
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      await database.commentDao.insertComment(commentToSave);
+      final newUser =
+          UserModel(username: username, email: email, password: password);
+      await database.userDao.insertUser(newUser);
 
       result = Result.fromSuccess();
     } catch (ex) {
@@ -49,16 +30,16 @@ class CommentsService {
     return result;
   }
 
-  Future<Result> deleteComment(CommentModel commentToDelete) async {
+  Future<Result> deleteUser(UserModel userToDelete) async {
     MobileDatabase? database;
-    Result<List<CommentModel>> result;
+    Result result;
 
     try {
       database = await $FloorMobileDatabase
           .databaseBuilder(Constants.databaseFileName)
           .build();
 
-      await database.commentDao.deleteComment(commentToDelete);
+      await database.userDao.deleteUser(userToDelete);
 
       result = Result.fromSuccess();
     } catch (ex) {
@@ -70,17 +51,37 @@ class CommentsService {
     return result;
   }
 
-  Future<Result> updateCommentsOwnerName(
-      String newOwnerName, int ownerId) async {
+  Future<Result<UserModel?>> getUserByEmail(String email) async {
     MobileDatabase? database;
-    Result<List<CommentModel>> result;
+    Result<UserModel?> result;
 
     try {
       database = await $FloorMobileDatabase
           .databaseBuilder(Constants.databaseFileName)
           .build();
 
-      await database.commentDao.updateCommentsOwnerName(newOwnerName, ownerId);
+      final foundUser = await database.userDao.findUserByEmail(email);
+
+      result = Result.fromResult(foundUser);
+    } catch (ex) {
+      result = Result.fromError(ex);
+    } finally {
+      database?.close();
+    }
+
+    return result;
+  }
+
+  Future<Result> updateUser(UserModel userToUpdate) async {
+    MobileDatabase? database;
+    Result result;
+
+    try {
+      database = await $FloorMobileDatabase
+          .databaseBuilder(Constants.databaseFileName)
+          .build();
+
+      await database.userDao.updateUser(userToUpdate);
 
       result = Result.fromSuccess();
     } catch (ex) {

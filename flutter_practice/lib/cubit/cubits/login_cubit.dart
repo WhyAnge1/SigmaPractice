@@ -1,45 +1,40 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_practice/misc/user_info.dart';
+import 'package:flutter_practice/misc/injection_configurator.dart';
+import 'package:flutter_practice/services/authorization_service.dart';
+import 'package:flutter_practice/services/user_service.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../misc/constants.dart';
-import '../../repository/repositories/database.dart';
 import '../states/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
+  final _authorizationService = getIt<AuthorizationService>();
+  final _userService = getIt<UserService>();
+
   LoginCubit() : super(InitialLoginState());
 
   Future<bool> tryLoginBySavedEmail() async {
-    MobileDatabase? database;
     bool isLoggedIn = false;
-
-    emit(LoadingLoginState());
 
     final prefferences = await SharedPreferences.getInstance();
     final savedEmail =
         prefferences.getString(Constants.autoLoginEmailPreffName);
 
     if (savedEmail != null) {
-      try {
-        database = await $FloorMobileDatabase
-            .databaseBuilder(Constants.databaseFileName)
-            .build();
+      final foundUserResult = await _userService.getUserByEmail(savedEmail);
 
-        final foundUser = await database.userDao.findUserByEmail(savedEmail);
+      if (foundUserResult.hasResult) {
+        var loginResult =
+            await _authorizationService.login(foundUserResult.result!);
 
-        if (foundUser == null) {
-          emit(ErrorLoginState(errorMesage: 'userEmailExistError'.tr));
-        } else {
-          UserInfo.saveLoggenInUser(foundUser);
+        if (loginResult.isSucceed) {
           isLoggedIn = true;
 
-          emit(LoggedInLoginState());
+          emit(SuccessfulLoginState());
+        } else {
+          emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
-      } catch (ex) {
-        emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
-      } finally {
-        database?.close();
       }
     }
 
@@ -47,45 +42,38 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   Future<bool> login(String email, String password, bool shouldLogin) async {
-    MobileDatabase? database;
     bool isLoggedIn = false;
 
     emit(LoadingLoginState());
 
-    if (validateInputData(email, password)) {
-      try {
-        database = await $FloorMobileDatabase
-            .databaseBuilder(Constants.databaseFileName)
-            .build();
+    if (_validateInputData(email, password)) {
+      final foundUserResult = await _userService.getUserByEmail(email);
 
-        final foundUser = await database.userDao.findUserByEmail(email);
+      if (foundUserResult.isSuccessHasNoResult ||
+          foundUserResult.hasResult &&
+              foundUserResult.result!.password != password) {
+        emit(ErrorLoginState(
+            errorMesage: 'userNotExistOrPasswordWrongError'.tr));
+      } else if (foundUserResult.hasResult) {
+        var loginResult =
+            await _authorizationService.login(foundUserResult.result!);
 
-        if (foundUser == null || foundUser.password != password) {
-          emit(ErrorLoginState(
-              errorMesage: 'userNotExistOrPasswordWrongError'.tr));
-        } else {
-          UserInfo.saveLoggenInUser(foundUser);
-
-          final prefferences = await SharedPreferences.getInstance();
-
-          prefferences.setString(
-              Constants.autoLoginEmailPreffName, foundUser.email);
-
+        if (loginResult.isSucceed) {
           isLoggedIn = true;
 
-          emit(LoggedInLoginState());
+          emit(SuccessfulLoginState());
+        } else {
+          emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
-      } catch (ex) {
+      } else {
         emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
-      } finally {
-        database?.close();
       }
     }
 
     return isLoggedIn;
   }
 
-  bool validateInputData(String email, String password) {
+  bool _validateInputData(String email, String password) {
     var isValid = true;
     String? errorText;
 

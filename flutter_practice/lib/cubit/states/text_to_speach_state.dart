@@ -1,12 +1,24 @@
-class TextToSpeachState {
-  bool isLoading = false;
-  String? errorText;
-  bool isAudioExist = false;
-  bool isOnPause = true;
+abstract class TextToSpeachState {
+  final bool shouldBuild;
 
-  TextToSpeachState(
-      {this.isLoading = false,
-      this.errorText,
-      this.isAudioExist = false,
-      this.isOnPause = true});
+  TextToSpeachState({this.shouldBuild = true});
+}
+
+class InitialTextToSpeachState extends TextToSpeachState {}
+
+class ErrorTextToSpeachState extends TextToSpeachState {
+  final String errorMesage;
+
+  ErrorTextToSpeachState({required this.errorMesage})
+      : super(shouldBuild: false);
+}
+
+class AudioTextToSpeachState extends TextToSpeachState {
+  final bool isOnPause;
+
+  AudioTextToSpeachState({required this.isOnPause});
+}
+
+class LoadingTextToSpeachState extends TextToSpeachState {
+  LoadingTextToSpeachState() : super(shouldBuild: false);
 }

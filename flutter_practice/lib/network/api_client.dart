@@ -1,19 +1,28 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_practice/helpers/result.dart';
+import 'package:injectable/injectable.dart';
 
+@singleton
 class ApiClient {
   final Dio _dio = Dio();
 
   Future<Result<Response>> downloadFile(
       String uri, String downloadedFilePath) async {
+    Result<Response> result;
+
     try {
       var response = await _dio.download(uri, downloadedFilePath);
 
-      return Result<Response>(result: response);
+      result = Result.fromResult(response);
     } catch (ex) {
-      return Result(occurredError: ex);
+      result = Result.fromError(ex);
     }
+
+    return result;
   }
 
-  void close() => _dio.close(force: true);
+  @disposeMethod
+  void dispose() {
+    _dio.close(force: true);
+  }
 }

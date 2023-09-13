@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/comments_service.dart';
 import 'package:flutter_practice/repository/models/comment_model.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,8 @@ import '../../misc/user_info.dart';
 import '../states/comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
-  final _commentsService = CommentsService();
+  final _commentsService = getIt<CommentsService>();
+  List<CommentModel> _cachedComments = List.empty(growable: true);
 
   CommentsCubit() : super(InitialCommentsState());
 
@@ -14,8 +16,10 @@ class CommentsCubit extends Cubit<CommentsState> {
     var newCommentsResult = await _commentsService.getSavedComments();
 
     if (newCommentsResult.isSucceed) {
-      if (newCommentsResult.result!.isNotEmpty) {
-        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      if (newCommentsResult.hasResult && newCommentsResult.result!.isNotEmpty) {
+        _cachedComments = newCommentsResult.result!;
+
+        emit(LoadedCommentsState(comments: _cachedComments));
       } else {
         emit(NoDataCommentsState());
       }
@@ -29,8 +33,10 @@ class CommentsCubit extends Cubit<CommentsState> {
         await _commentsService.deleteComment(commentToDelete);
 
     if (newCommentsResult.isSucceed) {
-      if (newCommentsResult.result!.isNotEmpty) {
-        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      _cachedComments.remove(commentToDelete);
+
+      if (_cachedComments.isNotEmpty) {
+        emit(LoadedCommentsState(comments: _cachedComments));
       } else {
         emit(NoDataCommentsState());
       }
@@ -53,10 +59,12 @@ class CommentsCubit extends Cubit<CommentsState> {
           rating: rating,
           ownerName: UserInfo.loggedInUser!.username);
 
-      var newCommentsResult = await _commentsService.saveComment(newComment);
+      var saveCommentsResult = await _commentsService.saveComment(newComment);
 
-      if (newCommentsResult.isSucceed) {
-        emit(LoadedCommentsState(comments: newCommentsResult.result!));
+      if (saveCommentsResult.isSucceed) {
+        _cachedComments.add(newComment);
+
+        emit(LoadedCommentsState(comments: _cachedComments));
       } else {
         emit(ErrorCommentsState(errorMesage: 'systemErrorPleaseContactUs'.tr));
       }

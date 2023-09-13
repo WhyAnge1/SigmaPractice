@@ -1,31 +1,27 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_practice/misc/constants.dart';
-import 'package:flutter_practice/network/api_client.dart';
+import 'package:flutter_practice/misc/injection_configurator.dart';
+import 'package:flutter_practice/services/text_convertion_service.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
-import '../../misc/api_urls.dart';
 import '../states/text_to_speach_state.dart';
 
 class TextToSpeachCubit extends Cubit<TextToSpeachState> {
-  final _apiClient = ApiClient();
+  final _textConvertionService = getIt<TextConvertionService>();
+  final _internetConnectionChecker = getIt<InternetConnectionChecker>();
   final _player = AudioPlayer();
-  bool _isAudioExist = false;
-  bool _isOnPause = true;
 
-  TextToSpeachCubit() : super(TextToSpeachState()) {
+  TextToSpeachCubit() : super(InitialTextToSpeachState()) {
     _player.setVolume(1);
     _player.setReleaseMode(ReleaseMode.stop);
     _player.onPlayerComplete.listen((_) {
-      _isOnPause = true;
-      _emit();
+      emit(AudioTextToSpeachState(isOnPause: true));
     });
   }
 
   @override
   Future<void> close() {
-    _apiClient.close();
     _player.dispose();
 
     return super.close();
@@ -33,58 +29,46 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
 
   void playAudioFile() {
     _player.resume();
-    _isOnPause = false;
 
-    _emit();
+    emit(AudioTextToSpeachState(isOnPause: false));
   }
 
   void pauseAudioFile() {
     _player.pause();
-    _isOnPause = true;
 
-    _emit();
+    emit(AudioTextToSpeachState(isOnPause: true));
   }
 
   Future convertTextToSpeach(String textToConvert) async {
-    _isAudioExist = false;
-    _isOnPause = true;
     _player.stop();
 
-    _emit(isLoading: true);
+    emit(LoadingTextToSpeachState());
 
     if (textToConvert.isEmpty) {
-      _emit(errorText: 'emptyTextError'.tr);
+      emit(ErrorTextToSpeachState(errorMesage: 'emptyTextError'.tr));
     } else {
-      try {
-        final downloadedFileDirectory = await getTemporaryDirectory();
-        final downloadedFilePath = "${downloadedFileDirectory.path}tts.mp3";
+      var hasInternetConnection =
+          await _internetConnectionChecker.hasConnection;
 
-        final downloadResult = await _apiClient.downloadFile(
-            ApiUrls.getTextToSpeachUrl(
-                Constants.textToSpeachApiKey, textToConvert),
-            downloadedFilePath);
+      if (hasInternetConnection) {
+        var convertionResult =
+            await _textConvertionService.convertTextToSpeach(textToConvert);
 
-        if (downloadResult.isSucceed &&
-            downloadResult.result?.statusCode == 200) {
-          _player.setSource(DeviceFileSource(downloadedFilePath));
+        if (convertionResult.hasResult) {
+          _player.setSource(DeviceFileSource(convertionResult.result!));
 
-          _isAudioExist = true;
-
-          _emit();
+          emit(AudioTextToSpeachState(isOnPause: true));
+        } else if (convertionResult.hasFailedWithoutError) {
+          emit(ErrorTextToSpeachState(
+              errorMesage: 'textToSpeachConvertionNotAvailableError'.tr));
         } else {
-          _emit(errorText: 'textToSpeachConvertionNotAvailableError'.tr);
+          emit(ErrorTextToSpeachState(
+              errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
-      } catch (ex) {
-        _emit(errorText: 'systemErrorPleaseContactUs'.tr);
+      } else {
+        emit(ErrorTextToSpeachState(
+            errorMesage: 'noInternetConnectionError'.tr));
       }
     }
-  }
-
-  void _emit({String? errorText, bool isLoading = false}) {
-    emit(TextToSpeachState(
-        isLoading: isLoading,
-        errorText: errorText,
-        isAudioExist: _isAudioExist,
-        isOnPause: _isOnPause));
   }
 }

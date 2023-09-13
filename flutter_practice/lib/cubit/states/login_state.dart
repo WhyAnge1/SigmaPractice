@@ -1,5 +1,3 @@
-import 'dart:core';
-
 abstract class LoginState {}
 
 class ErrorLoginState extends LoginState {
@@ -10,6 +8,6 @@ class ErrorLoginState extends LoginState {
 
 class LoadingLoginState extends LoginState {}
 
-class LoggedInLoginState extends LoginState {}
+class SuccessfulLoginState extends LoginState {}
 
 class InitialLoginState extends LoginState {}

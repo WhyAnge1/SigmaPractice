@@ -1,5 +1,9 @@
-class AccountSettingsState {
-  String? errorText;
+abstract class AccountSettingsState {}
 
-  AccountSettingsState({this.errorText});
+class InitialAccountSettingsState extends AccountSettingsState {}
+
+class ErrorAccountSettingsState extends AccountSettingsState {
+  final String errorMesage;
+
+  ErrorAccountSettingsState({required this.errorMesage});
 }

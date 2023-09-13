@@ -1,33 +1,45 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/misc/injection_configurator.dart';
+import 'package:flutter_practice/services/comments_service.dart';
+import 'package:flutter_practice/services/user_service.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../misc/constants.dart';
 import '../../misc/user_info.dart';
 import '../../repository/models/user_model.dart';
-import '../../repository/repositories/database.dart';
+import '../../services/authorization_service.dart';
 import '../states/account_settings_state.dart';
 
 class AccountSettingsCubit extends Cubit<AccountSettingsState> {
-  AccountSettingsCubit() : super(AccountSettingsState());
+  final _authorizationService = getIt<AuthorizationService>();
+  final _commentsService = getIt<CommentsService>();
+  final _userService = getIt<UserService>();
 
-  Future<bool> logout() async {
-    final prefferences = await SharedPreferences.getInstance();
-    prefferences.remove(Constants.autoLoginEmailPreffName);
-    UserInfo.clearLoggedInUser();
+  AccountSettingsCubit() : super(InitialAccountSettingsState());
 
-    return true;
+  Future logout() async {
+    await _authorizationService.logout();
   }
 
   UserModel getCurrentUserData() => UserInfo.loggedInUser!;
 
+  Future deleteAccount() async {
+    var deleteResult = await _userService.deleteUser(UserInfo.loggedInUser!);
+
+    if (deleteResult.isSucceed) {
+      await logout();
+    } else {
+      emit(ErrorAccountSettingsState(
+          errorMesage: 'systemErrorPleaseContactUs'.tr));
+    }
+  }
+
   Future<bool> saveNewUserInfo(String newUsername, String newEmail,
       String oldPassword, String newPassword, String confirmNewPassword) async {
-    MobileDatabase? database;
     bool isDataSaved = false;
 
-    if (validateInputData(
+    if (_validateInputData(
         newUsername, newEmail, oldPassword, newPassword, confirmNewPassword)) {
       final isEmailChanged = newEmail != UserInfo.loggedInUser!.email;
       final isUsernameChanged = newUsername != UserInfo.loggedInUser!.username;
@@ -35,22 +47,23 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
           newPassword != UserInfo.loggedInUser!.password);
 
       if (isEmailChanged || isUsernameChanged || isPasswordChanged) {
-        try {
-          database = await $FloorMobileDatabase
-              .databaseBuilder(Constants.databaseFileName)
-              .build();
+        final existUserResult = await _userService.getUserByEmail(newEmail);
 
-          final existUser = await database.userDao.findUserByEmail(newEmail);
-          if (isEmailChanged && existUser != null) {
-            _emit(errorText: 'emailExistError'.tr);
-          } else {
-            await database.userDao.updateUser(UserInfo.loggedInUser!);
+        if (isEmailChanged && existUserResult.hasResult) {
+          emit(ErrorAccountSettingsState(errorMesage: 'emailExistError'.tr));
+        } else if (existUserResult.isSucceed) {
+          var updatedUser = UserInfo.loggedInUser!;
 
-            if (isUsernameChanged) {
-              await database.commentDao.updateCommentsOwnerName(
-                  newUsername, UserInfo.loggedInUser!.id!);
-            }
+          updatedUser.email = newEmail;
+          updatedUser.username = newUsername;
 
+          if (newPassword.isNotEmpty) {
+            updatedUser.password = newPassword;
+          }
+
+          var updateResult = await _userService.updateUser(updatedUser);
+
+          if (updateResult.isSucceed) {
             UserInfo.loggedInUser!.email = newEmail;
             UserInfo.loggedInUser!.username = newUsername;
 
@@ -58,12 +71,19 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
               UserInfo.loggedInUser!.password = newPassword;
             }
 
+            if (isUsernameChanged) {
+              await _commentsService.updateCommentsOwnerName(
+                  newUsername, updatedUser.id!);
+            }
+
             isDataSaved = true;
+          } else {
+            emit(ErrorAccountSettingsState(
+                errorMesage: 'systemErrorPleaseContactUs'.tr));
           }
-        } catch (ex) {
-          _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-        } finally {
-          database?.close();
+        } else {
+          emit(ErrorAccountSettingsState(
+              errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
       }
     }
@@ -71,7 +91,7 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
     return isDataSaved;
   }
 
-  bool validateInputData(String username, String email, String oldPassword,
+  bool _validateInputData(String username, String email, String oldPassword,
       String newPassword, String confirmNewPassword) {
     var isValid = true;
     String? errorText;
@@ -93,31 +113,11 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
     }
 
     isValid = errorText == null;
+
     if (!isValid) {
-      _emit(errorText: errorText);
+      emit(ErrorAccountSettingsState(errorMesage: errorText));
     }
 
     return isValid;
   }
-
-  Future deleteAccount() async {
-    MobileDatabase? database;
-
-    try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      await database.userDao.deleteUser(UserInfo.loggedInUser!);
-
-      await logout();
-    } catch (ex) {
-      _emit(errorText: 'systemErrorPleaseContactUs'.tr);
-    } finally {
-      database?.close();
-    }
-  }
-
-  void _emit({String? errorText}) =>
-      emit(AccountSettingsState(errorText: errorText));
 }
