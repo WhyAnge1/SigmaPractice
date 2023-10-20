@@ -6,6 +6,7 @@ class Result<T> {
   T? get result => _result;
   Object? get occurredError => _occurredError;
   bool get isSucceed => _isSucceed;
+  bool get isFailed => !_isSucceed;
   bool get hasResult => _result != null;
   bool get isSuccessHasNoResult => _isSucceed && _result == null;
   bool get hasFailedWithoutError => !_isSucceed && _occurredError == null;

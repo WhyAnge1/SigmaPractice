@@ -1,20 +1,42 @@
+import 'package:flutter_practice/exception/email_not_verified_exception.dart';
 import 'package:flutter_practice/helpers/result.dart';
-import 'package:flutter_practice/misc/constants.dart';
-import 'package:flutter_practice/misc/user_info.dart';
-import 'package:flutter_practice/repository/models/user_model.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 @injectable
 class AuthorizationService {
-  Future<Result> login(UserModel user) async {
+  Future<Result> login(String email, String password) async {
     Result result;
 
     try {
-      UserInfo.saveLoggenInUser(user);
+      var credentials = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      final prefferences = await SharedPreferences.getInstance();
-      prefferences.setString(Constants.autoLoginEmailPreffName, user.email);
+      if (credentials.user != null && !credentials.user!.emailVerified) {
+        _sendVerificationToEmail();
+        logout();
+
+        result = Result.fromError(EmailNotVerifiedException());
+      } else {
+        result = Result.fromSuccess();
+      }
+    } catch (ex) {
+      result = Result.fromError(ex);
+    }
+
+    return result;
+  }
+
+  Future<Result> register(
+      String username, String email, String password) async {
+    Result<User> result;
+
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(username);
+      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+      await FirebaseAuth.instance.signOut();
 
       result = Result.fromSuccess();
     } catch (ex) {
@@ -25,8 +47,20 @@ class AuthorizationService {
   }
 
   Future logout() async {
-    final prefferences = await SharedPreferences.getInstance();
-    prefferences.remove(Constants.autoLoginEmailPreffName);
-    UserInfo.clearLoggedInUser();
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<Result> _sendVerificationToEmail() async {
+    Result result;
+
+    try {
+      await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+
+      result = Result.fromSuccess();
+    } catch (ex) {
+      result = Result.fromError(ex);
+    }
+
+    return result;
   }
 }

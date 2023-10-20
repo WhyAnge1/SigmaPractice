@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -15,4 +16,5 @@ void configureDependencies() {
 
 void registerCustomDependencies() {
   getIt.registerSingleton(InternetConnectionChecker());
+  getIt.registerSingleton(FirebaseAuth.instance);
 }

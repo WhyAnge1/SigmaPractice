@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/ui/pages/comments_page.dart';
+import 'package:flutter_practice/ui/pages/my_ip_page.dart';
 import 'package:flutter_practice/ui/pages/spider_starts_page.dart';
 import 'package:flutter_practice/ui/pages/text_to_speach_page.dart';
 
@@ -19,7 +20,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -43,6 +44,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                     Tab(icon: Icon(Icons.speaker)),
                     Tab(icon: Icon(Icons.rate_review)),
                     Tab(icon: Icon(Icons.brush_outlined)),
+                    Tab(icon: Icon(Icons.settings_input_antenna)),
                   ],
                 ),
               ),
@@ -65,7 +67,8 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
             children: const [
               TextToSpeachPage(),
               CommentsPage(),
-              SpiderStarsPage()
+              SpiderStarsPage(),
+              MyIpPage(),
             ],
           ),
         ),

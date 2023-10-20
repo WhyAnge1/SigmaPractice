@@ -31,7 +31,7 @@ class Strings extends Translations {
           'confirmNewPassword': 'Confirm new password',
           'createAnAccount': 'Create an account',
           'accountFor': 'Account for',
-          'createdSuccessfully': 'created successfully',
+          'createdSuccessfully': 'created successfully.',
           'emailExistError': 'User with this email adress is already exist',
           'commentFieldCanNotBeEmpty': "Comment field can't be empty",
           'systemErrorPleaseContactUs':
@@ -69,6 +69,22 @@ class Strings extends Translations {
           'emptyTextError': 'Text must not be empty!',
           'textToSpeachConvertionNotAvailableError':
               'Text to speach convertion is not available at this moment',
+          'getMyIp': 'Get my Ip',
+          'myIp': 'My Ip',
+          'noDataFoundYet': 'No data found yet',
+          'incorrectOldPassword': 'Incorrect old password',
+          'userNotFoundPleaseReloginAgain':
+              'User not found. Please, relogin again',
+          'enterYourCurrentPasswordToChangeYourEmail':
+              'Enter your current password to change your email',
+          'verifyYourNewEmailVerificationLinkIsSend':
+              'Please, verify your new email. Verification link is send to your new email.',
+          'verificationLinkIsSendToYourEmail':
+              'Verification link is send to your email.',
+          'emailForThisUserIsNotVerified':
+              'Email for this user is not verified. Please, check you email for verification link.',
+          'enterYourCurrentPasswordToDeleteYourAccount':
+              'Enter your current password to change delete your account',
         },
       };
 }

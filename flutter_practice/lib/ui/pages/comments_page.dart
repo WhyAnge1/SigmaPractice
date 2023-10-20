@@ -116,7 +116,7 @@ class _CommentsPageState extends State<CommentsPage>
       ListView.builder(
           itemCount: comments.length,
           itemBuilder: (BuildContext context, int index) =>
-              CommentCell(comments[index], _onCommentDelete));
+              CommentCell(comments[index], _onCommentDelete, key: UniqueKey()));
 
   Future _onRefresh() async => await _cubit.loadComments();
 

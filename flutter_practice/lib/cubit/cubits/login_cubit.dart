@@ -1,11 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/exception/email_not_verified_exception.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/authorization_service.dart';
 import 'package:flutter_practice/services/user_service.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../misc/constants.dart';
 import '../states/login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -14,54 +14,36 @@ class LoginCubit extends Cubit<LoginState> {
 
   LoginCubit() : super(InitialLoginState());
 
-  Future<bool> tryLoginBySavedEmail() async {
+  Future<bool> tryAutoLogin() async {
     bool isLoggedIn = false;
 
-    final prefferences = await SharedPreferences.getInstance();
-    final savedEmail =
-        prefferences.getString(Constants.autoLoginEmailPreffName);
+    final savedUser = _userService.currentLoggedInUser;
 
-    if (savedEmail != null) {
-      final foundUserResult = await _userService.getUserByEmail(savedEmail);
-
-      if (foundUserResult.hasResult) {
-        var loginResult =
-            await _authorizationService.login(foundUserResult.result!);
-
-        if (loginResult.isSucceed) {
-          isLoggedIn = true;
-
-          emit(SuccessfulLoginState());
-        } else {
-          emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
-        }
-      }
+    if (savedUser != null) {
+      isLoggedIn = true;
+      emit(SuccessfulLoginState());
     }
 
     return isLoggedIn;
   }
 
-  Future<bool> login(String email, String password, bool shouldLogin) async {
-    bool isLoggedIn = false;
-
+  Future login(String email, String password) async {
     emit(LoadingLoginState());
 
     if (_validateInputData(email, password)) {
-      final foundUserResult = await _userService.getUserByEmail(email);
+      var loginResult = await _authorizationService.login(email, password);
 
-      if (foundUserResult.isSuccessHasNoResult ||
-          foundUserResult.hasResult &&
-              foundUserResult.result!.password != password) {
-        emit(ErrorLoginState(
-            errorMesage: 'userNotExistOrPasswordWrongError'.tr));
-      } else if (foundUserResult.hasResult) {
-        var loginResult =
-            await _authorizationService.login(foundUserResult.result!);
+      if (loginResult.isSucceed) {
+        emit(SuccessfulLoginState());
+      } else if (loginResult.occurredError is EmailNotVerifiedException) {
+        emit(ErrorLoginState(errorMesage: 'emailForThisUserIsNotVerified'.tr));
+      } else if (loginResult.occurredError is FirebaseAuthException) {
+        var firebaseError = loginResult.occurredError as FirebaseAuthException;
 
-        if (loginResult.isSucceed) {
-          isLoggedIn = true;
-
-          emit(SuccessfulLoginState());
+        if (firebaseError.code == 'user-not-found' ||
+            firebaseError.code == 'wrong-password') {
+          emit(ErrorLoginState(
+              errorMesage: 'userNotExistOrPasswordWrongError'.tr));
         } else {
           emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
         }
@@ -69,8 +51,6 @@ class LoginCubit extends Cubit<LoginState> {
         emit(ErrorLoginState(errorMesage: 'systemErrorPleaseContactUs'.tr));
       }
     }
-
-    return isLoggedIn;
   }
 
   bool _validateInputData(String email, String password) {

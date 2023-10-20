@@ -1,3 +1,4 @@
+import 'package:flutter_practice/services/user_service.dart';
 import 'package:injectable/injectable.dart';
 
 import '../helpers/result.dart';
@@ -7,6 +8,10 @@ import '../repository/repositories/database.dart';
 
 @injectable
 class CommentsService {
+  final UserService _userService;
+
+  CommentsService(UserService userService) : _userService = userService;
+
   Future<Result<List<CommentModel>>> getSavedComments() async {
     MobileDatabase? database;
     Result<List<CommentModel>> result;
@@ -17,6 +22,11 @@ class CommentsService {
           .build();
 
       var comments = await database.commentDao.getAllComments();
+
+      for (var comment in comments) {
+        comment.isBelongToCurrentUser =
+            comment.ownerId == _userService.currentLoggedInUser?.uid;
+      }
 
       result = Result.fromResult(comments);
     } catch (ex) {
@@ -71,7 +81,7 @@ class CommentsService {
   }
 
   Future<Result> updateCommentsOwnerName(
-      String newOwnerName, int ownerId) async {
+      String newOwnerName, String ownerId) async {
     MobileDatabase? database;
     Result<List<CommentModel>> result;
 

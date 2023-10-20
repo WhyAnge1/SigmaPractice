@@ -1,21 +1,17 @@
 import 'package:floor/floor.dart';
-import 'package:flutter_practice/misc/user_info.dart';
-import 'package:flutter_practice/repository/models/user_model.dart';
 
-@Entity(foreignKeys: [
-  ForeignKey(
-      childColumns: ['ownerId'], parentColumns: ['id'], entity: UserModel, onDelete: ForeignKeyAction.cascade)
-])
+@entity
 class CommentModel {
   @PrimaryKey(autoGenerate: true)
   int? id;
-  int ownerId;
+  String ownerId;
   double rating;
   String comment;
   String ownerName;
   String? ownerImageFilePath;
 
-  bool get isBelongToCurrentUser => ownerId == UserInfo.loggedInUser?.id;
+  @ignore
+  bool isBelongToCurrentUser;
 
   CommentModel(
       {this.id,
@@ -23,7 +19,8 @@ class CommentModel {
       required this.rating,
       required this.comment,
       required this.ownerName,
-      this.ownerImageFilePath});
+      this.ownerImageFilePath,
+      this.isBelongToCurrentUser = false});
 
   @override
   bool operator ==(Object other) => other is CommentModel && other.id == id;

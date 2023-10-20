@@ -8,11 +8,12 @@ abstract class CommentDao {
   Future<List<CommentModel>> getAllComments();
 
   @insert
-  Future<void> insertComment(CommentModel person);
+  Future<void> insertComment(CommentModel model);
 
   @delete
-  Future<void> deleteComment(CommentModel person);
+  Future<void> deleteComment(CommentModel model);
 
-  @Query('Update CommentModel Set ownerName = :newOwnerName Where ownerId = :ownerId')
-   Future<void> updateCommentsOwnerName(String newOwnerName, int ownerId);
+  @Query(
+      'Update CommentModel Set ownerName = :newOwnerName Where ownerId = :ownerId')
+  Future<void> updateCommentsOwnerName(String newOwnerName, String ownerId);
 }

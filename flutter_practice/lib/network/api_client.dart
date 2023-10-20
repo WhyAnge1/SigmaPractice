@@ -21,6 +21,20 @@ class ApiClient {
     return result;
   }
 
+  Future<Result<Response>> get(String uri) async {
+    Result<Response> result;
+
+    try {
+      var response = await _dio.get(uri);
+
+      result = Result.fromResult(response);
+    } catch (ex) {
+      result = Result.fromError(ex);
+    }
+
+    return result;
+  }
+
   @disposeMethod
   void dispose() {
     _dio.close(force: true);

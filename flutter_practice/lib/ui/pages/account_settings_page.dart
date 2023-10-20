@@ -10,7 +10,6 @@ import 'package:get/get.dart';
 import '../../misc/app_colors.dart';
 import '../../misc/app_fonts.dart';
 import '../controls/custom_confirm_dialog.dart';
-import 'login_page.dart';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({super.key});
@@ -38,10 +37,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    var currentUser = _cubit.getCurrentUserData();
-
-    _nameTextFieldController.text = currentUser.username;
-    _emailTextFieldController.text = currentUser.email;
+    _cubit.loadCurrentUserData();
   }
 
   @override
@@ -288,6 +284,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
       BuildContext context, AccountSettingsState state) {
     if (state is ErrorAccountSettingsState) {
       Get.snackbar('error'.tr, state.errorMesage);
+    } else if (state is ShowInfoAccountSettingsState) {
+      Get.snackbar('info', state.infoMessage);
+    } else if (state is DefaultUserDataAccountSettingsState) {
+      _nameTextFieldController.text = state.username;
+      _emailTextFieldController.text = state.email;
     }
   }
 
@@ -295,22 +296,16 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
       setState(() => _shouldHidePassword = !_shouldHidePassword);
 
   Future _onSavePressed() async {
-    var isDataSaved = await _cubit.saveNewUserInfo(
+    await _cubit.saveNewUserInfo(
         _nameTextFieldController.text,
         _emailTextFieldController.text,
         _oldPasswordTexFieldController.text,
         _newPasswordTexFieldController.text,
         _confirmNewPasswordTexFieldController.text);
-
-    if (isDataSaved) {
-      Get.snackbar('info', 'newDataSavedSuccessfully'.tr);
-    }
   }
 
   Future _onLogOutPressed() async {
     await _cubit.logout();
-
-    await Get.offAll(const LoginPage());
   }
 
   void _onBackPressed() => Get.back();
@@ -326,9 +321,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage>
       ));
 
   Future _onConfirmDeletePressed() async {
-    await _cubit.deleteAccount();
-
-    await Get.offAll(const LoginPage());
+    await _cubit.deleteAccount(_oldPasswordTexFieldController.text);
   }
 
   void _onCancelDialogPressed() {

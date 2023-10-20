@@ -1,95 +1,107 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_practice/helpers/result.dart';
-import 'package:flutter_practice/misc/constants.dart';
-import 'package:flutter_practice/repository/models/user_model.dart';
-import 'package:flutter_practice/repository/repositories/database.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
 class UserService {
-  Future<Result> saveUser(
-      String email, String username, String password) async {
-    MobileDatabase? database;
+  User? get currentLoggedInUser => FirebaseAuth.instance.currentUser;
+
+  Future<Result> reloadUser() async {
     Result result;
 
     try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      final newUser =
-          UserModel(username: username, email: email, password: password);
-      await database.userDao.insertUser(newUser);
+      await FirebaseAuth.instance.currentUser?.reload();
 
       result = Result.fromSuccess();
     } catch (ex) {
       result = Result.fromError(ex);
-    } finally {
-      database?.close();
     }
 
     return result;
   }
 
-  Future<Result> deleteUser(UserModel userToDelete) async {
-    MobileDatabase? database;
+  Future<Result> deleteCurrentUser(String password) async {
     Result result;
 
     try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
+      await _reauthenticateUser(
+          FirebaseAuth.instance.currentUser!.email!, password);
 
-      await database.userDao.deleteUser(userToDelete);
+      await FirebaseAuth.instance.currentUser?.delete();
 
       result = Result.fromSuccess();
     } catch (ex) {
       result = Result.fromError(ex);
-    } finally {
-      database?.close();
     }
 
     return result;
   }
 
-  Future<Result<UserModel?>> getUserByEmail(String email) async {
-    MobileDatabase? database;
-    Result<UserModel?> result;
+  Future<Result> updateUserEmail(String email, String password) async {
+    Result result;
 
     try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
+      await _reauthenticateUser(
+          FirebaseAuth.instance.currentUser!.email!, password);
 
-      final foundUser = await database.userDao.findUserByEmail(email);
+      await FirebaseAuth.instance.currentUser?.verifyBeforeUpdateEmail(email);
 
-      result = Result.fromResult(foundUser);
+      result = Result.fromSuccess();
     } catch (ex) {
       result = Result.fromError(ex);
-    } finally {
-      database?.close();
     }
 
     return result;
   }
 
-  Future<Result> updateUser(UserModel userToUpdate) async {
-    MobileDatabase? database;
+  Future<Result> updateUserUsername(String username) async {
     Result result;
 
     try {
-      database = await $FloorMobileDatabase
-          .databaseBuilder(Constants.databaseFileName)
-          .build();
-
-      await database.userDao.updateUser(userToUpdate);
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(username);
 
       result = Result.fromSuccess();
     } catch (ex) {
       result = Result.fromError(ex);
-    } finally {
-      database?.close();
     }
 
     return result;
+  }
+
+  Future<Result> updateUserPassword(String password) async {
+    Result result;
+
+    try {
+      await FirebaseAuth.instance.currentUser?.updatePassword(password);
+
+      result = Result.fromSuccess();
+    } catch (ex) {
+      result = Result.fromError(ex);
+    }
+
+    return result;
+  }
+
+  Future<Result> validateCurrentPassword(String password) async {
+    Result result;
+
+    try {
+      await _reauthenticateUser(
+          FirebaseAuth.instance.currentUser!.email!, password);
+
+      result = Result.fromSuccess();
+    } catch (ex) {
+      result = Result.fromError(ex);
+    }
+
+    return result;
+  }
+
+  Future _reauthenticateUser(String email, String password) async {
+    var credentail =
+        EmailAuthProvider.credential(email: email, password: password);
+
+    await FirebaseAuth.instance.currentUser
+        ?.reauthenticateWithCredential(credentail);
   }
 }

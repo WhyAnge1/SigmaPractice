@@ -1,42 +1,37 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/misc/constants.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
-import 'package:flutter_practice/services/user_service.dart';
+import 'package:flutter_practice/services/authorization_service.dart';
 import 'package:get/get.dart';
-
-import '../../misc/constants.dart';
 import '../states/create_account_state.dart';
 
 class CreateAccountCubit extends Cubit<CreateAccountState> {
-  final _userService = getIt<UserService>();
+  final _authorizationService = getIt<AuthorizationService>();
 
   CreateAccountCubit() : super(InitialCreateAccountState());
 
-  Future<bool> createAccount(String username, String email, String password,
+  Future createAccount(String username, String email, String password,
       String confirmPassword) async {
-    bool isAccountCreated = false;
+    var validationResult =
+        _validateInputData(username, email, password, confirmPassword);
 
-    if (_validateInputData(username, email, password, confirmPassword)) {
-      var existResult = await _userService.getUserByEmail(email);
+    if (validationResult) {
+      var saveResult =
+          await _authorizationService.register(username, email, password);
 
-      if (existResult.isSuccessHasNoResult) {
-        var saveResult = await _userService.saveUser(email, username, password);
-
-        if (saveResult.isSucceed) {
-          isAccountCreated = true;
-        } else {
-          emit(ErrorCreateAccountState(
-              errorMesage: 'systemErrorPleaseContactUs'.tr));
-        }
-      } else if (existResult.hasResult) {
-        emit(ErrorCreateAccountState(errorMesage: 'emailExistError'.tr));
+      if (saveResult.isSucceed) {
+        emit(SuccessfulCreateAccountState());
+      } else if (saveResult.occurredError is FirebaseAuthException) {
+        emit(ErrorCreateAccountState(
+            errorMesage:
+                (saveResult.occurredError as FirebaseAuthException).message!));
       } else {
         emit(ErrorCreateAccountState(
             errorMesage: 'systemErrorPleaseContactUs'.tr));
       }
     }
-
-    return isAccountCreated;
   }
 
   bool _validateInputData(

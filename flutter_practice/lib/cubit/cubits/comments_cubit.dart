@@ -2,12 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/comments_service.dart';
 import 'package:flutter_practice/repository/models/comment_model.dart';
+import 'package:flutter_practice/services/user_service.dart';
 import 'package:get/get.dart';
-import '../../misc/user_info.dart';
 import '../states/comments_state.dart';
 
 class CommentsCubit extends Cubit<CommentsState> {
   final _commentsService = getIt<CommentsService>();
+  final _userService = getIt<UserService>();
   List<CommentModel> _cachedComments = List.empty(growable: true);
 
   CommentsCubit() : super(InitialCommentsState());
@@ -54,10 +55,11 @@ class CommentsCubit extends Cubit<CommentsState> {
       emit(ErrorCommentsState(errorMesage: 'commentFieldCanNotBeEmpty'.tr));
     } else {
       final newComment = CommentModel(
-          ownerId: UserInfo.loggedInUser!.id!,
+          ownerId: _userService.currentLoggedInUser!.uid,
           comment: comment,
           rating: rating,
-          ownerName: UserInfo.loggedInUser!.username);
+          ownerName: _userService.currentLoggedInUser!.displayName ?? "",
+          isBelongToCurrentUser: true);
 
       var saveCommentsResult = await _commentsService.saveComment(newComment);
 

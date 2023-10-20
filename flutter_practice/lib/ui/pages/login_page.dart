@@ -26,12 +26,11 @@ class _LoginPageState extends State<LoginPage>
   final _loginTextFieldController = TextEditingController();
   final _passwordTexFieldController = TextEditingController();
   bool _shouldHidePassword = true;
-  bool _shouldRememberLogin = false;
   bool _shouldShowLoader = false;
 
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) async {
-    var isLoginSuccessful = await _cubit.tryLoginBySavedEmail();
+    var isLoginSuccessful = await _cubit.tryAutoLogin();
 
     if (isLoginSuccessful) {
       Get.offAll(() => const MainPage());
@@ -135,28 +134,6 @@ class _LoginPageState extends State<LoginPage>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: Checkbox(
-                                    activeColor: AppColors.backgroundBlack,
-                                    checkColor: AppColors.backgroundWhite,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5)),
-                                    value: _shouldRememberLogin,
-                                    onChanged: _onRememberMeChecked),
-                              ),
-                              const SizedBox(width: 10),
-                              Text('rememberMe'.tr,
-                                  style: const TextStyle(
-                                      color: AppColors.textBlack,
-                                      fontFamily: AppFonts.productSans,
-                                      fontSize: 16)),
-                            ],
-                          ),
                           const SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: _onLoginPressed,
@@ -206,14 +183,16 @@ class _LoginPageState extends State<LoginPage>
 
   void _loginPageConsumerListener(
       BuildContext context, LoginState state) async {
+    _setLoaderVisibility(false);
+
     if (state is ErrorLoginState) {
       Get.snackbar('error'.tr, state.errorMesage);
-
-      _setLoaderVisibility(false);
     } else if (state is LoadingLoginState) {
       _setLoaderVisibility(true);
-    } else {
-      _setLoaderVisibility(false);
+    } else if (state is SuccessfulLoginState) {
+      await Get.offAll(() => const MainPage());
+
+      _clearFields();
     }
   }
 
@@ -223,18 +202,9 @@ class _LoginPageState extends State<LoginPage>
   void _onHidePasswordPressed() =>
       setState(() => _shouldHidePassword = !_shouldHidePassword);
 
-  void _onRememberMeChecked(bool? checked) =>
-      setState(() => _shouldRememberLogin = checked!);
-
   Future _onLoginPressed() async {
-    var isLoggedIn = await _cubit.login(_loginTextFieldController.text,
-        _passwordTexFieldController.text, _shouldRememberLogin);
-
-    if (isLoggedIn) {
-      await Get.offAll(() => const MainPage());
-
-      _clearFields();
-    }
+    await _cubit.login(
+        _loginTextFieldController.text, _passwordTexFieldController.text);
   }
 
   void _onCreateAccountPressed() async {

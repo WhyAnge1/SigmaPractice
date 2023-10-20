@@ -136,13 +136,12 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
 
   void _textToSpeachPageConsumerListener(
       BuildContext context, TextToSpeachState state) {
+    _setLoaderVisibility(false);
+
     if (state is ErrorTextToSpeachState) {
       Get.snackbar('error'.tr, state.errorMesage);
-      _setLoaderVisibility(false);
     } else if (state is LoadingTextToSpeachState) {
       _setLoaderVisibility(true);
-    } else {
-      _setLoaderVisibility(false);
     }
   }
 

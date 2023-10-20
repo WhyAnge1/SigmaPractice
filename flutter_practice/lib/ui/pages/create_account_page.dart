@@ -212,6 +212,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       BuildContext context, CreateAccountState state) {
     if (state is ErrorCreateAccountState) {
       Get.snackbar('error'.tr, state.errorMesage);
+    } else if (state is SuccessfulCreateAccountState) {
+      Get.back(result: _emailTextFieldController.text);
+      Get.snackbar('info'.tr,
+          "${'accountFor'.tr} ${_emailTextFieldController.text} ${'createdSuccessfully'.tr} ${'verificationLinkIsSendToYourEmail'.tr}");
     }
   }
 
@@ -219,17 +223,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       setState(() => _shouldHidePassword = !_shouldHidePassword);
 
   Future _onCreateAccountPressed() async {
-    var isAccountCreated = await _cubit.createAccount(
+    await _cubit.createAccount(
         _nameTextFieldController.text,
         _emailTextFieldController.text,
         _passwordTexFieldController.text,
         _confirmPasswordTexFieldController.text);
-
-    if (isAccountCreated) {
-      Get.back(result: _emailTextFieldController.text);
-      Get.snackbar('info'.tr,
-          "${'accountFor'.tr} ${_emailTextFieldController.text} ${'createdSuccessfully'.tr}");
-    }
   }
 
   void _onLogInPressed() => Get.back();
