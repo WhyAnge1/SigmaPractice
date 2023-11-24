@@ -1,4 +1,6 @@
+import 'package:event_bus_plus/res/event_bus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/event_bus_events/open_drawer_event.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/comments_service.dart';
 import 'package:flutter_practice/repository/models/comment_model.dart';
@@ -9,6 +11,7 @@ import '../states/comments_state.dart';
 class CommentsCubit extends Cubit<CommentsState> {
   final _commentsService = getIt<CommentsService>();
   final _userService = getIt<UserService>();
+  final _eventBus = getIt<EventBus>();
   List<CommentModel> _cachedComments = List.empty(growable: true);
 
   CommentsCubit() : super(InitialCommentsState());
@@ -71,5 +74,9 @@ class CommentsCubit extends Cubit<CommentsState> {
         emit(ErrorCommentsState(errorMesage: 'systemErrorPleaseContactUs'.tr));
       }
     }
+  }
+
+  void sendOpenDrawerEvent() {
+    _eventBus.fire(OpenDrawerEvent());
   }
 }

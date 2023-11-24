@@ -17,24 +17,41 @@ class CommentCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-        child: _model.isBelongToCurrentUser
-            ? Dismissible(
-                key: ValueKey(_model),
-                background: Container(
-                    color: AppColors.backgroundRed,
-                    padding: const EdgeInsets.all(10),
-                    child: const Align(
-                        alignment: Alignment.centerRight,
-                        child: Icon(Icons.delete_forever,
-                            color: AppColors.backgroundWhite))),
-                direction: DismissDirection.endToStart,
-                onDismissed: ((direction) => _onDelete(_model)),
-                child: _constructCellLayout(),
-              )
-            : _constructCellLayout());
+      elevation: 8,
+      color: AppColors.backgroundPrimary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: _model.isBelongToCurrentUser
+          ? Dismissible(
+              key: ValueKey(_model),
+              background: Container(
+                decoration: const BoxDecoration(
+                  color: AppColors.backgroundRed,
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                padding: const EdgeInsets.all(10),
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Icon(Icons.delete_forever,
+                      color: AppColors.backgroundPrimary),
+                ),
+              ),
+              direction: DismissDirection.endToStart,
+              onDismissed: ((direction) => _onDelete(_model)),
+              child: _constructCellLayout(),
+            )
+          : _constructCellLayout(),
+    );
   }
 
-  Widget _constructCellLayout() => Padding(
+  Widget _constructCellLayout() => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.backgroundPrimary,
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
         padding: const EdgeInsets.all(10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +78,7 @@ class CommentCell extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.textBlack,
+                              color: AppColors.textPrimary,
                               fontFamily: AppFonts.productSans),
                         ),
                       ),
@@ -93,7 +110,7 @@ class CommentCell extends StatelessWidget {
                     softWrap: true,
                     style: const TextStyle(
                         fontSize: 14,
-                        color: AppColors.textBlack,
+                        color: AppColors.textPrimary,
                         fontFamily: AppFonts.productSans),
                   ),
                 ],

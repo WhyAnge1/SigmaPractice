@@ -13,7 +13,6 @@ import '../../cubit/states/comments_state.dart';
 import '../../misc/app_colors.dart';
 import '../../misc/app_fonts.dart';
 import '../cells/comment_cell.dart';
-import 'account_settings_page.dart';
 
 class CommentsPage extends StatefulWidget {
   const CommentsPage({super.key});
@@ -47,35 +46,39 @@ class _CommentsPageState extends State<CommentsPage>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        key: _scaffoldGlobalKey,
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: AppColors.backgroundWhite,
-          shadowColor: Colors.transparent,
-          title: Text('comments'.tr,
+  Widget build(BuildContext context) => SafeArea(
+        top: false,
+        child: Scaffold(
+          key: _scaffoldGlobalKey,
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            backgroundColor: AppColors.backgroundSecondary,
+            title: Text(
+              'comments'.tr,
               style: const TextStyle(
-                  color: AppColors.textBlack,
+                  color: AppColors.textPrimary,
                   fontFamily: AppFonts.productSans,
                   fontSize: 22,
-                  fontWeight: FontWeight.bold)),
-          centerTitle: true,
-          leading: IconButton(
-              onPressed: _onAccountPressed,
-              icon: const Icon(Icons.person, color: AppColors.textBlack)),
-        ),
-        backgroundColor: AppColors.backgroundWhite,
-        body: SlidingUpPanel(
-          controller: _panelController,
-          panel: _constructFloatingPanel(),
-          collapsed: _constructFloatingCollapsed(),
-          color: Colors.transparent,
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-            child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppColors.iconGrey,
-              child: BlocConsumer<CommentsCubit, CommentsState>(
+                  fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            leading: IconButton(
+              onPressed: _openDrawer,
+              icon: const Icon(Icons.menu, color: AppColors.textPrimary),
+            ),
+          ),
+          backgroundColor: AppColors.backgroundPrimary,
+          body: SlidingUpPanel(
+            controller: _panelController,
+            panel: _constructFloatingPanel(),
+            collapsed: _constructFloatingCollapsed(),
+            color: Colors.transparent,
+            body: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: RefreshIndicator(
+                onRefresh: _onRefresh,
+                color: AppColors.indicatorPrimary,
+                child: BlocConsumer<CommentsCubit, CommentsState>(
                   listener: _commentsPageConsumerListener,
                   buildWhen: (previous, current) => current.shouldBuild,
                   bloc: _cubit,
@@ -85,7 +88,9 @@ class _CommentsPageState extends State<CommentsPage>
                     } else {
                       return _constructNoDataState();
                     }
-                  }),
+                  },
+                ),
+              ),
             ),
           ),
         ),
@@ -94,29 +99,37 @@ class _CommentsPageState extends State<CommentsPage>
   Widget _constructNoDataState() => SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: Center(
-          child: Column(children: [
-            const SizedBox(height: 100),
-            const Icon(
-              Icons.speaker_notes_off,
-              color: AppColors.iconGrey,
-              size: 80,
-            ),
-            const SizedBox(height: 30),
-            Text('noCommentsYet'.tr,
+          child: Column(
+            children: [
+              const SizedBox(height: 100),
+              const Icon(
+                Icons.speaker_notes_off,
+                color: AppColors.textPrimary,
+                size: 80,
+              ),
+              const SizedBox(height: 30),
+              Text(
+                'noCommentsYet'.tr,
                 style: const TextStyle(
-                    color: AppColors.iconGrey,
+                    color: AppColors.textPrimary,
                     fontFamily: AppFonts.productSans,
-                    fontSize: 18)),
-            const SizedBox(height: 200)
-          ]),
+                    fontSize: 18),
+              ),
+              const SizedBox(height: 200)
+            ],
+          ),
         ),
       );
 
   Widget _constructCommentsList(List<CommentModel> comments) =>
       ListView.builder(
-          itemCount: comments.length,
-          itemBuilder: (BuildContext context, int index) =>
-              CommentCell(comments[index], _onCommentDelete, key: UniqueKey()));
+        itemCount: comments.length,
+        itemBuilder: (BuildContext context, int index) => CommentCell(
+          comments[index],
+          _onCommentDelete,
+          key: UniqueKey(),
+        ),
+      );
 
   Future _onRefresh() async => await _cubit.loadComments();
 
@@ -130,21 +143,22 @@ class _CommentsPageState extends State<CommentsPage>
   Widget _constructFloatingCollapsed() {
     return Container(
       decoration: const BoxDecoration(
-          color: AppColors.backgroundWhite,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24.0),
-            topRight: Radius.circular(24.0),
-          )),
+        color: AppColors.backgroundPrimary,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24.0),
+          topRight: Radius.circular(24.0),
+        ),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const Icon(Icons.keyboard_arrow_up,
-              color: AppColors.iconGrey, size: 30),
+              color: AppColors.textPrimary, size: 30),
           const SizedBox(height: 20),
           Text(
             'pullUpToShareFeedback'.tr,
             style: const TextStyle(
-                color: AppColors.textBlack,
+                color: AppColors.textPrimary,
                 fontFamily: AppFonts.productSans,
                 fontSize: 16),
           ),
@@ -156,18 +170,19 @@ class _CommentsPageState extends State<CommentsPage>
   Widget _constructFloatingPanel() {
     return Container(
       decoration: const BoxDecoration(
-          color: AppColors.backgroundWhite,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24.0),
-            topRight: Radius.circular(24.0),
-          )),
+        color: AppColors.backgroundPrimary,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24.0),
+          topRight: Radius.circular(24.0),
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             const Icon(Icons.keyboard_arrow_down,
-                color: AppColors.iconGrey, size: 30),
+                color: AppColors.textPrimary, size: 30),
             const SizedBox(height: 60),
             RatingBar.builder(
                 initialRating: 3,
@@ -188,14 +203,14 @@ class _CommentsPageState extends State<CommentsPage>
               decoration: InputDecoration(
                 hintText: 'typeYourCommentHere'.tr,
                 hintStyle: const TextStyle(
-                    color: AppColors.disabledGrey,
+                    color: AppColors.textHelp,
                     fontFamily: AppFonts.productSans,
                     fontSize: 16),
                 enabledBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.separatorGrey),
+                  borderSide: BorderSide(color: AppColors.textPrimary),
                 ),
                 focusedBorder: const UnderlineInputBorder(
-                  borderSide: BorderSide(color: AppColors.separatorGrey),
+                  borderSide: BorderSide(color: AppColors.textPrimary),
                 ),
               ),
             ),
@@ -203,18 +218,21 @@ class _CommentsPageState extends State<CommentsPage>
             ElevatedButton(
               onPressed: _onSendButtonPressed,
               style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.backgroundBlack,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 15, horizontal: 35),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  )),
-              child: Text('save'.tr,
-                  style: const TextStyle(
-                      color: AppColors.backgroundWhite,
-                      fontFamily: AppFonts.productSans,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18)),
+                backgroundColor: AppColors.buttonPrimary,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 35),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
+              ),
+              child: Text(
+                'save'.tr,
+                style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontFamily: AppFonts.productSans,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
             )
           ],
         ),
@@ -222,7 +240,7 @@ class _CommentsPageState extends State<CommentsPage>
     );
   }
 
-  Future _onAccountPressed() async => await Get.to(const AccountSettingsPage());
+  void _openDrawer() => _cubit.sendOpenDrawerEvent();
 
   Future _onCommentDelete(CommentModel modelToDelete) async =>
       await _cubit.deleteComment(modelToDelete);

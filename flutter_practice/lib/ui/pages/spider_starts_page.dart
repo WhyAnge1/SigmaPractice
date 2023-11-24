@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/cubit/cubits/spider_stars_cubit.dart';
 import 'package:flutter_practice/ui/controls/spider_star.dart';
 import 'package:get/get.dart';
 
 import '../../misc/app_colors.dart';
 import '../../misc/app_fonts.dart';
-import 'account_settings_page.dart';
 
 class SpiderStarsPage extends StatefulWidget {
   const SpiderStarsPage({super.key});
@@ -15,38 +15,46 @@ class SpiderStarsPage extends StatefulWidget {
 
 class _SpiderStarsPageState extends State<SpiderStarsPage>
     with AutomaticKeepAliveClientMixin {
+  final _cubit = SpiderStarsCubit();
+
   @override
   bool get wantKeepAlive => true;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.backgroundWhite,
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundPrimary,
         appBar: AppBar(
-          backgroundColor: AppColors.backgroundWhite,
-          shadowColor: Colors.transparent,
-          title: Text('moveBlackCircle'.tr,
-              style: const TextStyle(
-                  color: AppColors.textBlack,
-                  fontFamily: AppFonts.productSans,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold)),
-          centerTitle: true,
+          backgroundColor: AppColors.backgroundSecondary,
+          title: Text(
+            'moveBlackCircle'.tr,
+            style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontFamily: AppFonts.productSans,
+                fontSize: 22,
+                fontWeight: FontWeight.bold),
+          ),
           leading: IconButton(
-              onPressed: _onAccountPressed,
-              icon: const Icon(
-                Icons.person,
-                color: AppColors.textBlack,
-              )),
+            onPressed: _openDrawer,
+            icon: const Icon(
+              Icons.menu,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ),
         body: LayoutBuilder(
           builder: (_, constraints) => Container(
             width: constraints.widthConstraints().maxWidth,
             height: constraints.heightConstraints().maxHeight,
-            color: AppColors.backgroundWhite,
+            color: AppColors.backgroundPrimary,
             child: const SpiderStar(),
           ),
         ),
-      );
+      ),
+    );
+  }
 
-  Future _onAccountPressed() async => await Get.to(const AccountSettingsPage());
+  void _openDrawer() => _cubit.sendOpenDrawerEvent();
 }

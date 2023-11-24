@@ -1,3 +1,4 @@
+import 'package:event_bus_plus/res/event_bus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
@@ -17,4 +18,5 @@ void configureDependencies() {
 void registerCustomDependencies() {
   getIt.registerSingleton(InternetConnectionChecker());
   getIt.registerSingleton(FirebaseAuth.instance);
+  getIt.registerSingleton(EventBus());
 }

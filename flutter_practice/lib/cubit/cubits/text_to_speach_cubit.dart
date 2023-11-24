@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:event_bus_plus/res/event_bus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/event_bus_events/open_drawer_event.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/text_convertion_service.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
   final _textConvertionService = getIt<TextConvertionService>();
   final _internetConnectionChecker = getIt<InternetConnectionChecker>();
   final _player = AudioPlayer();
+  final _eventBus = getIt<EventBus>();
 
   TextToSpeachCubit() : super(InitialTextToSpeachState()) {
     _player.setVolume(1);
@@ -70,5 +73,9 @@ class TextToSpeachCubit extends Cubit<TextToSpeachState> {
             errorMesage: 'noInternetConnectionError'.tr));
       }
     }
+  }
+
+  void sendOpenDrawerEvent() {
+    _eventBus.fire(OpenDrawerEvent());
   }
 }

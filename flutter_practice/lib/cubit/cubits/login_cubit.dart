@@ -14,17 +14,12 @@ class LoginCubit extends Cubit<LoginState> {
 
   LoginCubit() : super(InitialLoginState());
 
-  Future<bool> tryAutoLogin() async {
-    bool isLoggedIn = false;
-
+  Future tryAutoLogin() async {
     final savedUser = _userService.currentLoggedInUser;
 
     if (savedUser != null) {
-      isLoggedIn = true;
       emit(SuccessfulLoginState());
     }
-
-    return isLoggedIn;
   }
 
   Future login(String email, String password) async {

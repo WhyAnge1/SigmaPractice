@@ -1,5 +1,7 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:event_bus_plus/res/event_bus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_practice/event_bus_events/open_drawer_event.dart';
 import 'package:flutter_practice/misc/injection_configurator.dart';
 import 'package:flutter_practice/services/comments_service.dart';
 import 'package:flutter_practice/services/user_service.dart';
@@ -14,6 +16,7 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
   final _authorizationService = getIt<AuthorizationService>();
   final _commentsService = getIt<CommentsService>();
   final _userService = getIt<UserService>();
+  final _eventBus = getIt<EventBus>();
 
   AccountSettingsCubit() : super(InitialAccountSettingsState());
 
@@ -36,6 +39,10 @@ class AccountSettingsCubit extends Cubit<AccountSettingsState> {
 
       await logout();
     }
+  }
+
+  void sendOpenDrawerEvent() {
+    _eventBus.fire(OpenDrawerEvent());
   }
 
   Future deleteAccount(String password) async {

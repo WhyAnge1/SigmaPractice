@@ -25,22 +25,25 @@ class SpiderStarState extends State<SpiderStar> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onPanStart: (details) {
-          _paintManager.fingerOffset =
-              Offset(details.localPosition.dx, details.localPosition.dy);
-          _paintManager.startDragging();
-          setState(() {});
-        },
-        onPanEnd: (details) {
-          _paintManager.stopDragging();
+      onPanStart: (details) {
+        _paintManager.fingerOffset =
+            Offset(details.localPosition.dx, details.localPosition.dy);
+        _paintManager.startDragging();
+        setState(() {});
+      },
+      onPanEnd: (details) {
+        _paintManager.stopDragging();
 
-          setState(() {});
-        },
-        onPanUpdate: (details) {
-          _paintManager.fingerOffset =
-              Offset(details.localPosition.dx, details.localPosition.dy);
-          setState(() {});
-        },
-        child: CustomPaint(painter: StarsPainter()));
+        setState(() {});
+      },
+      onPanUpdate: (details) {
+        _paintManager.fingerOffset =
+            Offset(details.localPosition.dx, details.localPosition.dy);
+        setState(() {});
+      },
+      child: CustomPaint(
+        painter: StarsPainter(),
+      ),
+    );
   }
 }

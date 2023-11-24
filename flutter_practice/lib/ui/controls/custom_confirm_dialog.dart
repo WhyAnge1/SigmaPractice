@@ -11,14 +11,21 @@ class CustomConformDialog extends StatelessWidget {
   final Function() onConfirmPressed;
   final Function() onCancelPressed;
 
-  const CustomConformDialog({required this.titleText, required this.bodyText, required this.cancelText, required this.confirmText, required this.onConfirmPressed,required this.onCancelPressed, super.key});
+  const CustomConformDialog(
+      {required this.titleText,
+      required this.bodyText,
+      required this.cancelText,
+      required this.confirmText,
+      required this.onConfirmPressed,
+      required this.onCancelPressed,
+      super.key});
 
   @override
   Widget build(BuildContext context) => Center(
         child: Container(
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: AppColors.backgroundWhite),
+              color: AppColors.backgroundPrimary),
           width: 300,
           height: 210,
           child: Padding(
@@ -27,7 +34,7 @@ class CustomConformDialog extends StatelessWidget {
               DefaultTextStyle(
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      color: AppColors.textBlack,
+                      color: AppColors.textPrimary,
                       fontFamily: AppFonts.productSans,
                       fontSize: 22,
                       height: 2,
@@ -37,7 +44,7 @@ class CustomConformDialog extends StatelessWidget {
               DefaultTextStyle(
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    color: AppColors.textBlack,
+                    color: AppColors.textPrimary,
                     fontFamily: AppFonts.productSans,
                     fontSize: 16),
                 child: Text(bodyText),
@@ -49,13 +56,13 @@ class CustomConformDialog extends StatelessWidget {
                   ElevatedButton(
                     onPressed: onConfirmPressed,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.backgroundBlack,
+                        backgroundColor: AppColors.backgroundSecondary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(18.0),
                         )),
                     child: Text(confirmText,
                         style: const TextStyle(
-                            color: AppColors.backgroundWhite,
+                            color: AppColors.backgroundPrimary,
                             fontFamily: AppFonts.productSans,
                             fontWeight: FontWeight.bold,
                             fontSize: 14)),
@@ -64,16 +71,16 @@ class CustomConformDialog extends StatelessWidget {
                   ElevatedButton(
                     onPressed: onCancelPressed,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.backgroundWhite,
+                        backgroundColor: AppColors.backgroundPrimary,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
                             side: const BorderSide(
                               width: 1,
-                              color: AppColors.backgroundBlack,
+                              color: AppColors.backgroundSecondary,
                             ))),
                     child: Text(cancelText,
                         style: const TextStyle(
-                            color: AppColors.textBlack,
+                            color: AppColors.textPrimary,
                             fontFamily: AppFonts.productSans,
                             fontWeight: FontWeight.bold,
                             fontSize: 14)),

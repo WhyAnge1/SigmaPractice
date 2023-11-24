@@ -40,7 +40,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         bloc: _cubit,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: AppColors.backgroundWhite,
+          backgroundColor: AppColors.backgroundPrimary,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(
@@ -49,15 +49,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
-                      flex: 3,
-                      fit: FlexFit.tight,
-                      child: Text('createYourAccountTitle'.tr,
-                          style: const TextStyle(
-                              color: AppColors.textBlack,
-                              fontFamily: AppFonts.productSans,
-                              fontSize: 24,
-                              height: 2,
-                              fontWeight: FontWeight.bold))),
+                    flex: 3,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      'createYourAccountTitle'.tr,
+                      style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontFamily: AppFonts.productSans,
+                          fontSize: 24,
+                          height: 2,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   Flexible(
                     flex: 11,
                     child: Column(
@@ -68,16 +71,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           decoration: InputDecoration(
                             hintText: 'enterYourUsername'.tr,
                             hintStyle: const TextStyle(
-                                color: AppColors.disabledGrey,
+                                color: AppColors.textHelp,
                                 fontFamily: AppFonts.productSans,
                                 fontSize: 16),
                             enabledBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                             focusedBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                           ),
                         ),
@@ -88,16 +91,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           decoration: InputDecoration(
                             hintText: 'emailAdress'.tr,
                             hintStyle: const TextStyle(
-                                color: AppColors.disabledGrey,
+                                color: AppColors.textHelp,
                                 fontFamily: AppFonts.productSans,
                                 fontSize: 16),
                             enabledBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                             focusedBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                           ),
                         ),
@@ -114,21 +117,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   _shouldHidePassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: AppColors.iconGrey),
+                                  color: AppColors.textPrimary),
                               onPressed: _onHidePasswordPressed,
                             ),
                             hintText: 'password'.tr,
                             hintStyle: const TextStyle(
-                                color: AppColors.disabledGrey,
+                                color: AppColors.textHelp,
                                 fontFamily: AppFonts.productSans,
                                 fontSize: 16),
                             enabledBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                             focusedBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                           ),
                         ),
@@ -145,40 +148,43 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   _shouldHidePassword
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: AppColors.iconGrey),
+                                  color: AppColors.textPrimary),
                               onPressed: _onHidePasswordPressed,
                             ),
                             hintText: 'confirmPassword'.tr,
                             hintStyle: const TextStyle(
-                                color: AppColors.disabledGrey,
+                                color: AppColors.textHelp,
                                 fontFamily: AppFonts.productSans,
                                 fontSize: 16),
                             enabledBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                             focusedBorder: const UnderlineInputBorder(
                               borderSide:
-                                  BorderSide(color: AppColors.separatorGrey),
+                                  BorderSide(color: AppColors.textPrimary),
                             ),
                           ),
                         ),
                         const SizedBox(height: 40),
                         ElevatedButton(
-                            onPressed: _onCreateAccountPressed,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.backgroundBlack,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 15, horizontal: 35),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                )),
-                            child: Text('signUpCaps'.tr,
-                                style: const TextStyle(
-                                    color: AppColors.backgroundWhite,
-                                    fontFamily: AppFonts.productSans,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18))),
+                          onPressed: _onCreateAccountPressed,
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.buttonPrimary,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 35),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                              )),
+                          child: Text(
+                            'signUpCaps'.tr,
+                            style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontFamily: AppFonts.productSans,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -188,17 +194,20 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     children: [
                       Text('alreadyHaveAnAccount'.tr,
                           style: const TextStyle(
-                              color: AppColors.textBlack,
+                              color: AppColors.textPrimary,
                               fontFamily: AppFonts.productSans,
                               fontSize: 16)),
                       TextButton(
-                          onPressed: _onLogInPressed,
-                          child: Text('logIn'.tr,
-                              style: const TextStyle(
-                                  color: AppColors.textBlack,
-                                  decoration: TextDecoration.underline,
-                                  fontFamily: AppFonts.productSans,
-                                  fontSize: 16))),
+                        onPressed: _onLogInPressed,
+                        child: Text(
+                          'logIn'.tr,
+                          style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              decoration: TextDecoration.underline,
+                              fontFamily: AppFonts.productSans,
+                              fontSize: 16),
+                        ),
+                      ),
                     ],
                   ),
                 ],

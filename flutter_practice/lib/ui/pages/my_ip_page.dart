@@ -4,7 +4,6 @@ import 'package:flutter_practice/cubit/cubits/my_ip_cubit.dart';
 import 'package:flutter_practice/cubit/states/my_ip_state.dart';
 import 'package:flutter_practice/misc/app_colors.dart';
 import 'package:flutter_practice/misc/app_fonts.dart';
-import 'package:flutter_practice/ui/pages/account_settings_page.dart';
 import 'package:get/get.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
@@ -24,41 +23,46 @@ class _MyIpPageState extends State<MyIpPage>
   bool get wantKeepAlive => true;
 
   @override
-  Widget build(Object context) => Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundWhite,
-        shadowColor: Colors.transparent,
-        title: Text('myIp'.tr,
-            style: const TextStyle(
-                color: AppColors.textBlack,
-                fontFamily: AppFonts.productSans,
-                fontSize: 22,
-                fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        leading: IconButton(
-            onPressed: _onAccountPressed,
-            icon: const Icon(
-              Icons.person,
-              color: AppColors.textBlack,
-            )),
-      ),
-      body: Stack(children: [
-        Visibility(
-            visible: _shouldShowLoader,
-            child: const Center(
-              child: LoadingIndicator(
-                  colors: [AppColors.backgroundBlack],
-                  indicatorType: Indicator.ballClipRotateMultiple),
-            )),
-        Opacity(
-            opacity: _shouldShowLoader ? 0.4 : 1,
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-                child: Center(
-                  child: Column(
+  Widget build(Object context) => SafeArea(
+        top: false,
+        child: Scaffold(
+          backgroundColor: AppColors.backgroundPrimary,
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            backgroundColor: AppColors.backgroundSecondary,
+            title: Text(
+              'myIp'.tr,
+              style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontFamily: AppFonts.productSans,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold),
+            ),
+            leading: IconButton(
+              onPressed: _openDrawer,
+              icon: const Icon(
+                Icons.menu,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          body: Stack(
+            children: [
+              Visibility(
+                visible: _shouldShowLoader,
+                child: const Center(
+                  child: LoadingIndicator(
+                      colors: [AppColors.indicatorPrimary],
+                      indicatorType: Indicator.ballClipRotateMultiple),
+                ),
+              ),
+              Opacity(
+                opacity: _shouldShowLoader ? 0.4 : 1,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+                  child: Center(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         BlocConsumer<MyIpCubit, MyIpState>(
@@ -73,30 +77,39 @@ class _MyIpPageState extends State<MyIpPage>
                         ElevatedButton(
                           onPressed: _onGetMyIpPressed,
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.backgroundBlack,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 15, horizontal: 35),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                              )),
-                          child: Text('getMyIp'.tr,
-                              style: const TextStyle(
-                                  color: AppColors.backgroundWhite,
-                                  fontFamily: AppFonts.productSans,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18)),
+                            backgroundColor: AppColors.buttonPrimary,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 35),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                            ),
+                          ),
+                          child: Text(
+                            'getMyIp'.tr,
+                            style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontFamily: AppFonts.productSans,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
                         ),
-                      ]),
-                )))
-      ]));
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
 
-  Widget _buildIpText(MyIpState state) {
-    if (state is DataMyIpState) {
-      return Text(state.ip);
-    } else {
-      return Text('noDataFoundYet'.tr);
-    }
-  }
+  Widget _buildIpText(MyIpState state) =>
+      Text(state is DataMyIpState ? state.ip : 'noDataFoundYet'.tr,
+          style: const TextStyle(
+              color: AppColors.textPrimary,
+              fontFamily: AppFonts.productSans,
+              fontWeight: FontWeight.bold,
+              fontSize: 18));
 
   void _myIpPageConsumerListener(BuildContext context, MyIpState state) {
     _setLoaderVisibility(false);
@@ -113,5 +126,5 @@ class _MyIpPageState extends State<MyIpPage>
 
   Future _onGetMyIpPressed() async => await _cubit.getMyIp();
 
-  Future _onAccountPressed() async => await Get.to(const AccountSettingsPage());
+  void _openDrawer() => _cubit.sendOpenDrawerEvent();
 }

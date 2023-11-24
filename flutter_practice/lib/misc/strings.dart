@@ -85,6 +85,7 @@ class Strings extends Translations {
               'Email for this user is not verified. Please, check you email for verification link.',
           'enterYourCurrentPasswordToDeleteYourAccount':
               'Enter your current password to change delete your account',
+          'bouncingTabBar': 'Bouncing TabBar',
         },
       };
 }

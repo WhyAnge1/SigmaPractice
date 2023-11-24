@@ -14,11 +14,11 @@ class StarsPainter extends CustomPainter {
 
   final _circlePaint = Paint()
     ..style = PaintingStyle.fill
-    ..color = AppColors.backgroundBlack
+    ..color = AppColors.circleBlack
     ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
   final _linePaint = Paint()
     ..style = PaintingStyle.stroke
-    ..color = AppColors.backgroundBlack
+    ..color = AppColors.circleBlack
     ..strokeWidth = 1;
   final _starPaint = Paint()
     ..style = PaintingStyle.fill
