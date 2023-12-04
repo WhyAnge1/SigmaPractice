@@ -14,10 +14,17 @@ class ShowInfoAccountSettingsState extends AccountSettingsState {
   ShowInfoAccountSettingsState({required this.infoMessage});
 }
 
-class DefaultUserDataAccountSettingsState extends AccountSettingsState {
+class UserDataAccountSettingsState extends AccountSettingsState {
   final String username;
   final String email;
+  final String? imageUrl;
 
-  DefaultUserDataAccountSettingsState(
-      {required this.username, required this.email});
+  UserDataAccountSettingsState(
+      {required this.username, required this.email, required this.imageUrl});
+}
+
+class LoadingAvatarAccountSettingsState extends AccountSettingsState {
+  final bool isLoading;
+
+  LoadingAvatarAccountSettingsState({this.isLoading = true});
 }

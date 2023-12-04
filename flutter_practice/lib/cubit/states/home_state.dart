@@ -8,9 +8,13 @@ class ErrorHomeState extends HomeState {
   ErrorHomeState({required this.errorMesage});
 }
 
-class DefaultHomeState extends HomeState {
+class UserDataHomeState extends HomeState {
   final String username;
   final String email;
+  final String? imageUrl;
 
-  DefaultHomeState({required this.username, required this.email});
+  UserDataHomeState(
+      {required this.username, required this.email, required this.imageUrl});
 }
+
+class OpenDrawerState extends HomeState {}

@@ -8,7 +8,7 @@ class CommentModel {
   double rating;
   String comment;
   String ownerName;
-  String? ownerImageFilePath;
+  String? ownerPhotoUrl;
 
   @ignore
   bool isBelongToCurrentUser;
@@ -19,7 +19,7 @@ class CommentModel {
       required this.rating,
       required this.comment,
       required this.ownerName,
-      this.ownerImageFilePath,
+      this.ownerPhotoUrl,
       this.isBelongToCurrentUser = false});
 
   @override

@@ -113,7 +113,9 @@ class _TextToSpeachPageState extends State<TextToSpeachPage>
                   BlocConsumer<TextToSpeachCubit, TextToSpeachState>(
                     listener: _textToSpeachPageConsumerListener,
                     bloc: _cubit,
-                    buildWhen: (previous, current) => current.shouldBuild,
+                    buildWhen: (previous, current) {
+                      return current.shouldBuild;
+                    },
                     builder: (context, state) {
                       if (state is AudioTextToSpeachState) {
                         return IconButton(

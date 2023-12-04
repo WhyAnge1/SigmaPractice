@@ -57,11 +57,14 @@ class CommentsCubit extends Cubit<CommentsState> {
     if (comment.isEmpty) {
       emit(ErrorCommentsState(errorMesage: 'commentFieldCanNotBeEmpty'.tr));
     } else {
+      var currentUser = _userService.currentLoggedInUser!;
+
       final newComment = CommentModel(
-          ownerId: _userService.currentLoggedInUser!.uid,
+          ownerId: currentUser.uid,
           comment: comment,
           rating: rating,
-          ownerName: _userService.currentLoggedInUser!.displayName ?? "",
+          ownerName: currentUser.displayName ?? "",
+          ownerPhotoUrl: currentUser.photoURL,
           isBelongToCurrentUser: true);
 
       var saveCommentsResult = await _commentsService.saveComment(newComment);

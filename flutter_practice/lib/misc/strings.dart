@@ -86,6 +86,8 @@ class Strings extends Translations {
           'enterYourCurrentPasswordToDeleteYourAccount':
               'Enter your current password to change delete your account',
           'bouncingTabBar': 'Bouncing TabBar',
+          'photoPermissionsDeniedError':
+              'Photo permissions denied. Please, allow photo permissions in settings',
         },
       };
 }

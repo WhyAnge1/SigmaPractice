@@ -59,10 +59,13 @@ class CommentCell extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 10),
               child: CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: _model.ownerImageFilePath?.isEmpty ?? true
-                      ? const AssetImage(AppImages.defaultUserIcon)
-                      : Image.file(File(_model.ownerImageFilePath!)).image),
+                backgroundColor: AppColors.backgroundPrimary,
+                foregroundImage: _model.ownerPhotoUrl != null
+                    ? Image.network(_model.ownerPhotoUrl!).image
+                    : const AssetImage(
+                        AppImages.defaultUserIcon,
+                      ),
+              ),
             ),
             Expanded(
               child: Column(

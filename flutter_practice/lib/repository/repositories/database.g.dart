@@ -85,7 +85,7 @@ class _$MobileDatabase extends MobileDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `CommentModel` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `ownerId` TEXT NOT NULL, `rating` REAL NOT NULL, `comment` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `ownerImageFilePath` TEXT)');
+            'CREATE TABLE IF NOT EXISTS `CommentModel` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `ownerId` TEXT NOT NULL, `rating` REAL NOT NULL, `comment` TEXT NOT NULL, `ownerName` TEXT NOT NULL, `ownerPhotoUrl` TEXT)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -113,7 +113,7 @@ class _$CommentDao extends CommentDao {
                   'rating': item.rating,
                   'comment': item.comment,
                   'ownerName': item.ownerName,
-                  'ownerImageFilePath': item.ownerImageFilePath
+                  'ownerPhotoUrl': item.ownerPhotoUrl
                 }),
         _commentModelDeletionAdapter = DeletionAdapter(
             database,
@@ -125,7 +125,7 @@ class _$CommentDao extends CommentDao {
                   'rating': item.rating,
                   'comment': item.comment,
                   'ownerName': item.ownerName,
-                  'ownerImageFilePath': item.ownerImageFilePath
+                  'ownerPhotoUrl': item.ownerPhotoUrl
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -147,7 +147,7 @@ class _$CommentDao extends CommentDao {
             rating: row['rating'] as double,
             comment: row['comment'] as String,
             ownerName: row['ownerName'] as String,
-            ownerImageFilePath: row['ownerImageFilePath'] as String?));
+            ownerPhotoUrl: row['ownerPhotoUrl'] as String?));
   }
 
   @override

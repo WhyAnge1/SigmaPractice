@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_practice/cubit/cubits/home_cubit.dart';
 import 'package:flutter_practice/cubit/states/home_state.dart';
 import 'package:flutter_practice/misc/app_fonts.dart';
+import 'package:flutter_practice/misc/app_images.dart';
 import 'package:flutter_practice/ui/pages/account_settings_page.dart';
 import 'package:flutter_practice/ui/pages/bouncing_tab_bar_page.dart';
 import 'package:flutter_practice/ui/pages/comments_page.dart';
@@ -63,101 +64,118 @@ class _HomePageState extends State<HomePage>
 
   @override
   void initState() {
-    _cubit.subscribeToEventBus().listen((event) {
-      _openDrawer();
-    });
+    _cubit.subscribeToEvents();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<HomeCubit, HomeState>(
+    return BlocConsumer<HomeCubit, HomeState>(
       bloc: _cubit,
+      buildWhen: (previous, current) =>
+          current is UserDataHomeState || current is InitialHomeState,
       listener: _homePageConsumerListener,
-      child: Scaffold(
-        key: _key,
-        backgroundColor: AppColors.backgroundPrimary,
-        body: PageView(
-            physics: const NeverScrollableScrollPhysics(),
-            controller: _pageController,
-            children: drawerPages),
-        drawer: Drawer(
-          backgroundColor: AppColors.backgroundPrimary,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              DrawerHeader(
-                margin: EdgeInsets.zero,
-                decoration: const BoxDecoration(
-                  color: AppColors.backgroundSecondary,
-                ),
-                padding: const EdgeInsets.all(10),
-                child: BlocBuilder<HomeCubit, HomeState>(
-                  bloc: _cubit,
-                  buildWhen: (previous, current) =>
-                      current is InitialHomeState ||
-                      current is DefaultHomeState,
-                  builder: _homePageConsumerBuilder,
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  physics: const ClampingScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  itemCount: drawerListCells.length,
-                  itemBuilder: (context, index) => ListTile(
-                    selectedTileColor: AppColors.backgroundSelected,
-                    selected: _selectedPageIndex == index,
-                    title: Text(
-                      drawerListCells[index].title,
-                      style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontFamily: AppFonts.productSans,
-                          fontSize: 16),
-                    ),
-                    leading: Icon(drawerListCells[index].icon,
-                        color: AppColors.textPrimary),
-                    onTap: () => openPage(context, drawerListCells[index].type),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      builder: _homePageConsumerBuilder,
     );
   }
 
   void _homePageConsumerListener(BuildContext context, HomeState state) {
     if (state is ErrorHomeState) {
       Get.snackbar('error'.tr, state.errorMesage);
+    } else if (state is OpenDrawerState) {
+      _openDrawer();
     }
   }
 
   Widget _homePageConsumerBuilder(BuildContext context, HomeState state) {
-    return state is DefaultHomeState
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                state.username,
-                style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontFamily: AppFonts.productSans,
-                    fontSize: 22),
+    return Scaffold(
+      key: _key,
+      backgroundColor: AppColors.backgroundPrimary,
+      resizeToAvoidBottomInset: false,
+      body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: _pageController,
+        children: drawerPages,
+      ),
+      drawer: Drawer(
+        backgroundColor: AppColors.backgroundPrimary,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DrawerHeader(
+              margin: EdgeInsets.zero,
+              decoration: const BoxDecoration(
+                color: AppColors.backgroundSecondary,
               ),
-              Text(
-                state.email,
-                style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontFamily: AppFonts.productSans,
-                    fontSize: 16),
+              padding: const EdgeInsets.all(10),
+              child: state is UserDataHomeState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state.imageUrl != null)
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor: AppColors.backgroundPrimary,
+                            backgroundImage: const AssetImage(
+                              AppImages.defaultUserIcon,
+                            ),
+                            foregroundImage: NetworkImage(
+                              state.imageUrl!,
+                            ),
+                          ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          state.username,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontFamily: AppFonts.productSans,
+                            fontSize: 22,
+                          ),
+                        ),
+                        Text(
+                          state.email,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontFamily: AppFonts.productSans,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Container(),
+            ),
+            Expanded(
+              child: ListView.builder(
+                physics: const ClampingScrollPhysics(),
+                padding: EdgeInsets.zero,
+                itemCount: drawerListCells.length,
+                itemBuilder: (context, index) => ListTile(
+                  selectedTileColor: AppColors.backgroundSelected,
+                  selected: _selectedPageIndex == index,
+                  title: Text(
+                    drawerListCells[index].title,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontFamily: AppFonts.productSans,
+                      fontSize: 16,
+                    ),
+                  ),
+                  leading: Icon(
+                    drawerListCells[index].icon,
+                    color: AppColors.textPrimary,
+                  ),
+                  onTap: () => openPage(context, drawerListCells[index].type),
+                ),
               ),
-            ],
-          )
-        : Container();
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void openPage(BuildContext context, Type type) {
